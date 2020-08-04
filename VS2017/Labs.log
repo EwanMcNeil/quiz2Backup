@@ -1,0 +1,95 @@
+﻿  main.cpp
+C:\Users\Ewan\Desktop\COMP371_A2_Team1_VS\COMP371_A2_Team1_VS\Lab_Framework\VS2017\shader.h(56,40): warning C4101: 'e': unreferenced local variable
+C:\Users\Ewan\Desktop\COMP371_A2_Team1_VS\COMP371_A2_Team1_VS\Lab_Framework\VS2017\draw.h(394,1): warning C4305: 'argument': truncation from 'double' to 'float'
+C:\Users\Ewan\Desktop\COMP371_A2_Team1_VS\COMP371_A2_Team1_VS\Lab_Framework\VS2017\draw.h(516,16): warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+C:\Users\Ewan\Desktop\COMP371_A2_Team1_VS\COMP371_A2_Team1_VS\Lab_Framework\VS2017\draw.h(527,23): warning C4996: 'fscanf': This function or variable may be unsafe. Consider using fscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+C:\Users\Ewan\Desktop\COMP371_A2_Team1_VS\COMP371_A2_Team1_VS\Lab_Framework\VS2017\draw.h(535,23): warning C4996: 'fscanf': This function or variable may be unsafe. Consider using fscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+C:\Users\Ewan\Desktop\COMP371_A2_Team1_VS\COMP371_A2_Team1_VS\Lab_Framework\VS2017\draw.h(541,23): warning C4996: 'fscanf': This function or variable may be unsafe. Consider using fscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+C:\Users\Ewan\Desktop\COMP371_A2_Team1_VS\COMP371_A2_Team1_VS\Lab_Framework\VS2017\draw.h(550,23): warning C4996: 'fscanf': This function or variable may be unsafe. Consider using fscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+C:\Users\Ewan\Desktop\COMP371_A2_Team1_VS\COMP371_A2_Team1_VS\Lab_Framework\VS2017\draw.h(568,31): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+C:\Users\Ewan\Desktop\COMP371_A2_Team1_VS\COMP371_A2_Team1_VS\Lab_Framework\VS2017\draw.h(571,31): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+C:\Users\Ewan\Desktop\COMP371_A2_Team1_VS\COMP371_A2_Team1_VS\Lab_Framework\VS2017\draw.h(574,35): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+C:\Users\Ewan\Desktop\COMP371_A2_Team1_VS\COMP371_A2_Team1_VS\Lab_Framework\VS2017\draw.h(577,39): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+C:\Users\Ewan\Desktop\COMP371_A2_Team1_VS\COMP371_A2_Team1_VS\Lab_Framework\VS2017\draw.h(817,1): warning C4305: 'initializing': truncation from 'double' to 'float'
+C:\Users\Ewan\Desktop\COMP371_A2_Team1_VS\COMP371_A2_Team1_VS\Lab_Framework\VS2017\draw.h(872,1): warning C4305: 'initializing': truncation from 'double' to 'float'
+C:\Users\Ewan\Desktop\COMP371_A2_Team1_VS\COMP371_A2_Team1_VS\Lab_Framework\VS2017\draw.h(1330,1): warning C4305: 'argument': truncation from 'double' to 'float'
+C:\Users\Ewan\Desktop\COMP371_A2_Team1_VS\COMP371_A2_Team1_VS\Lab_Framework\VS2017\draw.h(1368,1): warning C4305: 'argument': truncation from 'double' to 'float'
+C:\Users\Ewan\Desktop\COMP371_A2_Team1_VS\COMP371_A2_Team1_VS\Lab_Framework\VS2017\draw.h(1585,1): warning C4305: 'argument': truncation from 'double' to 'float'
+C:\Users\Ewan\Desktop\COMP371_A2_Team1_VS\COMP371_A2_Team1_VS\Lab_Framework\VS2017\draw.h(1625,1): warning C4305: 'argument': truncation from 'double' to 'float'
+C:\Users\Ewan\Desktop\COMP371_A2_Team1_VS\COMP371_A2_Team1_VS\Lab_Framework\VS2017\draw.h(1712,1): warning C4305: 'argument': truncation from 'double' to 'float'
+C:\Users\Ewan\Desktop\COMP371_A2_Team1_VS\COMP371_A2_Team1_VS\Lab_Framework\VS2017\draw.h(1722,1): warning C4305: 'argument': truncation from 'double' to 'float'
+C:\Users\Ewan\Desktop\COMP371_A2_Team1_VS\COMP371_A2_Team1_VS\Lab_Framework\VS2017\draw.h(1763,1): warning C4305: 'argument': truncation from 'double' to 'float'
+C:\Users\Ewan\Desktop\COMP371_A2_Team1_VS\COMP371_A2_Team1_VS\Lab_Framework\VS2017\draw.h(2010,1): warning C4305: 'argument': truncation from 'double' to 'float'
+C:\Users\Ewan\Desktop\COMP371_A2_Team1_VS\COMP371_A2_Team1_VS\Lab_Framework\VS2017\draw.h(2048,1): warning C4305: 'argument': truncation from 'double' to 'float'
+C:\Users\Ewan\Desktop\COMP371_A2_Team1_VS\COMP371_A2_Team1_VS\Lab_Framework\VS2017\draw.h(2146,1): warning C4305: 'argument': truncation from 'double' to 'float'
+C:\Users\Ewan\Desktop\COMP371_A2_Team1_VS\COMP371_A2_Team1_VS\Lab_Framework\VS2017\draw.h(2183,1): warning C4305: 'argument': truncation from 'double' to 'float'
+C:\Users\Ewan\Desktop\COMP371_A2_Team1_VS\COMP371_A2_Team1_VS\Lab_Framework\VS2017\draw.h(2271,1): warning C4305: 'argument': truncation from 'double' to 'float'
+C:\Users\Ewan\Desktop\COMP371_A2_Team1_VS\COMP371_A2_Team1_VS\Lab_Framework\VS2017\draw.h(2305,1): warning C4305: 'argument': truncation from 'double' to 'float'
+C:\Users\Ewan\Desktop\COMP371_A2_Team1_VS\COMP371_A2_Team1_VS\Lab_Framework\VS2017\draw.h(2981,86): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+C:\Users\Ewan\Desktop\COMP371_A2_Team1_VS\COMP371_A2_Team1_VS\Lab_Framework\VS2017\draw.h(2981,81): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+C:\Users\Ewan\Desktop\COMP371_A2_Team1_VS\COMP371_A2_Team1_VS\Lab_Framework\VS2017\draw.h(2981,76): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+C:\Users\Ewan\Desktop\COMP371_A2_Team1_VS\COMP371_A2_Team1_VS\Lab_Framework\VS2017\draw.h(2981,71): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+C:\Users\Ewan\Desktop\COMP371_A2_Team1_VS\COMP371_A2_Team1_VS\Lab_Framework\VS2017\draw.h(2981,66): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+C:\Users\Ewan\Desktop\COMP371_A2_Team1_VS\COMP371_A2_Team1_VS\Lab_Framework\VS2017\draw.h(2981,61): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+C:\Users\Ewan\Desktop\COMP371_A2_Team1_VS\COMP371_A2_Team1_VS\Lab_Framework\VS2017\draw.h(2985,86): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+C:\Users\Ewan\Desktop\COMP371_A2_Team1_VS\COMP371_A2_Team1_VS\Lab_Framework\VS2017\draw.h(2985,81): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+C:\Users\Ewan\Desktop\COMP371_A2_Team1_VS\COMP371_A2_Team1_VS\Lab_Framework\VS2017\draw.h(2985,76): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+C:\Users\Ewan\Desktop\COMP371_A2_Team1_VS\COMP371_A2_Team1_VS\Lab_Framework\VS2017\draw.h(2985,71): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+C:\Users\Ewan\Desktop\COMP371_A2_Team1_VS\COMP371_A2_Team1_VS\Lab_Framework\VS2017\draw.h(2985,66): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+C:\Users\Ewan\Desktop\COMP371_A2_Team1_VS\COMP371_A2_Team1_VS\Lab_Framework\VS2017\draw.h(2985,61): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+C:\Users\Ewan\Desktop\COMP371_A2_Team1_VS\COMP371_A2_Team1_VS\Lab_Framework\VS2017\draw.h(2989,86): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+C:\Users\Ewan\Desktop\COMP371_A2_Team1_VS\COMP371_A2_Team1_VS\Lab_Framework\VS2017\draw.h(2989,81): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+C:\Users\Ewan\Desktop\COMP371_A2_Team1_VS\COMP371_A2_Team1_VS\Lab_Framework\VS2017\draw.h(2989,76): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+C:\Users\Ewan\Desktop\COMP371_A2_Team1_VS\COMP371_A2_Team1_VS\Lab_Framework\VS2017\draw.h(2989,71): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+C:\Users\Ewan\Desktop\COMP371_A2_Team1_VS\COMP371_A2_Team1_VS\Lab_Framework\VS2017\draw.h(2989,66): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+C:\Users\Ewan\Desktop\COMP371_A2_Team1_VS\COMP371_A2_Team1_VS\Lab_Framework\VS2017\draw.h(2989,61): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+C:\Users\Ewan\Desktop\COMP371_A2_Team1_VS\COMP371_A2_Team1_VS\Lab_Framework\VS2017\draw.h(2992,86): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+C:\Users\Ewan\Desktop\COMP371_A2_Team1_VS\COMP371_A2_Team1_VS\Lab_Framework\VS2017\draw.h(2992,81): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+C:\Users\Ewan\Desktop\COMP371_A2_Team1_VS\COMP371_A2_Team1_VS\Lab_Framework\VS2017\draw.h(2992,76): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+C:\Users\Ewan\Desktop\COMP371_A2_Team1_VS\COMP371_A2_Team1_VS\Lab_Framework\VS2017\draw.h(2992,71): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+C:\Users\Ewan\Desktop\COMP371_A2_Team1_VS\COMP371_A2_Team1_VS\Lab_Framework\VS2017\draw.h(2992,66): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+C:\Users\Ewan\Desktop\COMP371_A2_Team1_VS\COMP371_A2_Team1_VS\Lab_Framework\VS2017\draw.h(2992,61): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+C:\Users\Ewan\Desktop\COMP371_A2_Team1_VS\COMP371_A2_Team1_VS\Lab_Framework\VS2017\draw.h(2996,86): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+C:\Users\Ewan\Desktop\COMP371_A2_Team1_VS\COMP371_A2_Team1_VS\Lab_Framework\VS2017\draw.h(2996,81): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+C:\Users\Ewan\Desktop\COMP371_A2_Team1_VS\COMP371_A2_Team1_VS\Lab_Framework\VS2017\draw.h(2996,76): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+C:\Users\Ewan\Desktop\COMP371_A2_Team1_VS\COMP371_A2_Team1_VS\Lab_Framework\VS2017\draw.h(2996,71): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+C:\Users\Ewan\Desktop\COMP371_A2_Team1_VS\COMP371_A2_Team1_VS\Lab_Framework\VS2017\draw.h(2996,66): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+C:\Users\Ewan\Desktop\COMP371_A2_Team1_VS\COMP371_A2_Team1_VS\Lab_Framework\VS2017\draw.h(2996,61): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+C:\Users\Ewan\Desktop\COMP371_A2_Team1_VS\COMP371_A2_Team1_VS\Lab_Framework\VS2017\draw.h(3016,86): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+C:\Users\Ewan\Desktop\COMP371_A2_Team1_VS\COMP371_A2_Team1_VS\Lab_Framework\VS2017\draw.h(3016,81): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+C:\Users\Ewan\Desktop\COMP371_A2_Team1_VS\COMP371_A2_Team1_VS\Lab_Framework\VS2017\draw.h(3016,76): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+C:\Users\Ewan\Desktop\COMP371_A2_Team1_VS\COMP371_A2_Team1_VS\Lab_Framework\VS2017\draw.h(3016,71): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+C:\Users\Ewan\Desktop\COMP371_A2_Team1_VS\COMP371_A2_Team1_VS\Lab_Framework\VS2017\draw.h(3016,66): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+C:\Users\Ewan\Desktop\COMP371_A2_Team1_VS\COMP371_A2_Team1_VS\Lab_Framework\VS2017\draw.h(3016,61): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+C:\Users\Ewan\Desktop\COMP371_A2_Team1_VS\COMP371_A2_Team1_VS\Lab_Framework\VS2017\draw.h(3020,86): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+C:\Users\Ewan\Desktop\COMP371_A2_Team1_VS\COMP371_A2_Team1_VS\Lab_Framework\VS2017\draw.h(3020,81): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+C:\Users\Ewan\Desktop\COMP371_A2_Team1_VS\COMP371_A2_Team1_VS\Lab_Framework\VS2017\draw.h(3020,76): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+C:\Users\Ewan\Desktop\COMP371_A2_Team1_VS\COMP371_A2_Team1_VS\Lab_Framework\VS2017\draw.h(3020,71): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+C:\Users\Ewan\Desktop\COMP371_A2_Team1_VS\COMP371_A2_Team1_VS\Lab_Framework\VS2017\draw.h(3020,66): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+C:\Users\Ewan\Desktop\COMP371_A2_Team1_VS\COMP371_A2_Team1_VS\Lab_Framework\VS2017\draw.h(3020,61): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+C:\Users\Ewan\Desktop\COMP371_A2_Team1_VS\COMP371_A2_Team1_VS\Lab_Framework\VS2017\draw.h(3024,86): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+C:\Users\Ewan\Desktop\COMP371_A2_Team1_VS\COMP371_A2_Team1_VS\Lab_Framework\VS2017\draw.h(3024,81): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+C:\Users\Ewan\Desktop\COMP371_A2_Team1_VS\COMP371_A2_Team1_VS\Lab_Framework\VS2017\draw.h(3024,76): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+C:\Users\Ewan\Desktop\COMP371_A2_Team1_VS\COMP371_A2_Team1_VS\Lab_Framework\VS2017\draw.h(3024,71): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+C:\Users\Ewan\Desktop\COMP371_A2_Team1_VS\COMP371_A2_Team1_VS\Lab_Framework\VS2017\draw.h(3024,66): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+C:\Users\Ewan\Desktop\COMP371_A2_Team1_VS\COMP371_A2_Team1_VS\Lab_Framework\VS2017\draw.h(3024,61): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+C:\Users\Ewan\Desktop\COMP371_A2_Team1_VS\COMP371_A2_Team1_VS\Lab_Framework\VS2017\draw.h(3027,86): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+C:\Users\Ewan\Desktop\COMP371_A2_Team1_VS\COMP371_A2_Team1_VS\Lab_Framework\VS2017\draw.h(3027,81): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+C:\Users\Ewan\Desktop\COMP371_A2_Team1_VS\COMP371_A2_Team1_VS\Lab_Framework\VS2017\draw.h(3027,76): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+C:\Users\Ewan\Desktop\COMP371_A2_Team1_VS\COMP371_A2_Team1_VS\Lab_Framework\VS2017\draw.h(3027,71): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+C:\Users\Ewan\Desktop\COMP371_A2_Team1_VS\COMP371_A2_Team1_VS\Lab_Framework\VS2017\draw.h(3027,66): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+C:\Users\Ewan\Desktop\COMP371_A2_Team1_VS\COMP371_A2_Team1_VS\Lab_Framework\VS2017\draw.h(3027,61): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+C:\Users\Ewan\Desktop\COMP371_A2_Team1_VS\COMP371_A2_Team1_VS\Lab_Framework\VS2017\draw.h(3031,86): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+C:\Users\Ewan\Desktop\COMP371_A2_Team1_VS\COMP371_A2_Team1_VS\Lab_Framework\VS2017\draw.h(3031,81): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+C:\Users\Ewan\Desktop\COMP371_A2_Team1_VS\COMP371_A2_Team1_VS\Lab_Framework\VS2017\draw.h(3031,76): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+C:\Users\Ewan\Desktop\COMP371_A2_Team1_VS\COMP371_A2_Team1_VS\Lab_Framework\VS2017\draw.h(3031,71): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+C:\Users\Ewan\Desktop\COMP371_A2_Team1_VS\COMP371_A2_Team1_VS\Lab_Framework\VS2017\draw.h(3031,66): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+C:\Users\Ewan\Desktop\COMP371_A2_Team1_VS\COMP371_A2_Team1_VS\Lab_Framework\VS2017\draw.h(3031,61): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+C:\Users\Ewan\Desktop\COMP371_A2_Team1_VS\COMP371_A2_Team1_VS\Lab_Framework\Source\main.cpp(383,20): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\Ewan\Desktop\COMP371_A2_Team1_VS\COMP371_A2_Team1_VS\Lab_Framework\Source\main.cpp(433,17): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+C:\Users\Ewan\Desktop\COMP371_A2_Team1_VS\COMP371_A2_Team1_VS\Lab_Framework\Source\main.cpp(434,17): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+C:\Users\Ewan\Desktop\COMP371_A2_Team1_VS\COMP371_A2_Team1_VS\Lab_Framework\Source\main.cpp(438,19): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\Ewan\Desktop\COMP371_A2_Team1_VS\COMP371_A2_Team1_VS\Lab_Framework\Source\main.cpp(439,19): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\Ewan\Desktop\COMP371_A2_Team1_VS\COMP371_A2_Team1_VS\Lab_Framework\Source\main.cpp(440,13): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+C:\Users\Ewan\Desktop\COMP371_A2_Team1_VS\COMP371_A2_Team1_VS\Lab_Framework\Source\main.cpp(441,13): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+  Labs.vcxproj -> C:\Users\Ewan\Desktop\COMP371_A2_Team1_VS\COMP371_A2_Team1_VS\Lab_Framework\VS2017\/../Bin/A2-Debug.exe
