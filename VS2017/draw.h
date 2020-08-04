@@ -400,36 +400,19 @@ public:
     }
 };
 
-
-class Statue : public Drawable {
-private:
+class YAxis : public Cube, public Drawable {
+public:
     Shader shader{};
     Material material{};
-    GLuint activeVAO;
-    int activeVertices;
 
-
-public:
-    explicit Statue() {
-       
-        std::string heraclesPath = "../Assets/Models/heracles.obj";
-
-
-        //trying to add model object
-
-        int heraclesVertices;
-        GLuint heraclesVAO = setupModelEBO(heraclesPath, heraclesVertices);
-        activeVertices = heraclesVertices;
-        activeVAO = heraclesVAO;
-
+    YAxis() {
         this->shader = Shader("../VS2017/resources/shaders/ModelVertexShader.glsl",
             "../VS2017/resources/shaders/ModelFragmentShader.glsl",
-            "../VS2017/resources/textures/metallic_surface.png");
+            "../VS2017/resources/textures/red.png");
         this->material = METALLIC;
-        
     }
 
-    ~Statue() override {
+    ~YAxis() override {
         glDeleteProgram(shader.ID);
     }
 
@@ -443,8 +426,8 @@ public:
 
     }
 
-    void draw(const MVPL mvpl, LightParams lp, const glm::vec3& cameraPos) const override {
-
+    void
+        draw(const MVPL mvpl, LightParams lp, const glm::vec3& cameraPos) const override {
 
         shader.use();
         shader.setBool("shadows", shadows);
@@ -467,230 +450,182 @@ public:
 
         shader.setInt("shadowMap", 1);
 
-        // Bind geometry
-        //this->shader.use();
-        std::cout << "draw" << "\n";
-        glBindVertexArray(activeVAO);
+        glBindVertexArray(vao);
 
-        mat4 modelMatrix =  glm::translate(mat4(1.0f), vec3(0.0f, -2.0f, -3.0f))*
-            glm::rotate(mat4(1.0f), radians(45.0f), vec3(0.0f, 1.0f, 0.0f))*
-            glm::rotate(mat4(1.0f), radians(-90.0f), vec3(1.0f, 0.0f, 0.0f));
-        // Draw geometry
-        shader.setMat4("local_transform", modelMatrix);
-        glDrawElements(GL_TRIANGLES, activeVertices, GL_UNSIGNED_INT, 0);
-      
-        // Unbind geometry
-        glBindVertexArray(0);
+        glm::mat4 unitmat4(1);
+        glm::mat4 input(1);
+        glm::mat4 vertical = glm::scale(unitmat4, glm::vec3(0.25f, 3.0f, 0.25f));
 
-      
+        shader.setMat4("local_transform", scaleandTranslate(0.0, 0.0, 0.0, 1.0, 1.0, 1.0, vertical));
+        glDrawArrays(renderMode, 0, size);
+
+       
     }
 
     void drawShadows(const glm::mat4& model, Shader& depthShader, const glm::mat4& lsm) const override {
+
         depthShader.setMat4("lightSpaceMatrix", glm::translate(lsm, getPosition()) * getTransform());
         depthShader.setMat4("model", glm::translate(model, getPosition()) * getTransform());
         //depthShader.setMat4("lightSpaceMatrix", lsm);
         //depthShader.setMat4("model", model);
-        glBindVertexArray(activeVAO);
-        // Draw geometry
-        glDrawElements(GL_TRIANGLES, activeVertices, GL_UNSIGNED_INT, 0);
 
-        // Unbind geometry
-        glBindVertexArray(0);
-        //nothing
-       
+        glBindVertexArray(vao);
+
+        glm::mat4 unitmat4(1);
+
+
+        glm::mat4 horizontal = glm::scale(unitmat4, glm::vec3(1.0f, 0.5f, 0.25f));
+        glm::mat4 vertical = glm::scale(unitmat4, glm::vec3(0.5f, 1.0f, 0.25f));
+
+
+        /* M ------ */
+
+        //base
+        shader.setMat4("local_transform", scaleandTranslate(0.0, 0.0, 0.0, 1.0, 1.0, 1.0, vertical));
+        glDrawArrays(renderMode, 0, size);
+
+        //leftside
+        shader.setMat4("local_transform", scaleandTranslate(0.0, 1.10f, 0.0, 1.0, 1.0, 1.0, vertical));
+        glDrawArrays(renderMode, 0, size);
+
+        //middle
+        shader.setMat4("local_transform", scaleandTranslate(0.5, 3.85f, 0.0, 1.0, 1.0, 1.0, horizontal));
+        glDrawArrays(renderMode, 0, size);
+
+        //rightside
+        shader.setMat4("local_transform", scaleandTranslate(1.75, 3.85f, 0.0, 1.0, 1.0, 1.0, horizontal));
+        glDrawArrays(renderMode, 0, size);
+
+        //top
+        shader.setMat4("local_transform", scaleandTranslate(2.75, 0.0, 0.0, 1.0, 1.0, 1.0, vertical));
+        glDrawArrays(renderMode, 0, size);
+
+        shader.setMat4("local_transform", scaleandTranslate(2.75, 1.10f, 0.0, 1.0, 1.0, 1.0, vertical));
+        glDrawArrays(renderMode, 0, size);
+        /* -------- */
+
+        shader.setMat4("local_transform", scaleandTranslate(5.25, 0.0, 0.0, 1.0, 1.0, 1.0, vertical));
+        glDrawArrays(renderMode, 0, size);
+        /* -------- */
+
+        shader.setMat4("local_transform", scaleandTranslate(5.25, 1.10f, 0.0, 1.0, 1.0, 1.0, vertical));
+        glDrawArrays(renderMode, 0, size);
     }
 
+};
 
-    bool loadObject(
-        const char* path,
-        std::vector<int>& vertexIndices,
-        std::vector<glm::vec3>& temp_vertices,
-        std::vector<glm::vec3>& out_normals,
-        std::vector<glm::vec2>& out_uvs) {
 
-        std::vector<int> uvIndices, normalIndices;
-        std::vector<glm::vec2> temp_uvs;
-        std::vector<glm::vec3> temp_normals;
 
-        FILE* file;
-        file = fopen(path, "r");
-        if (!file) {
-            printf("Impossible to open the file ! Are you in the right path ?\n");
-            getchar();
-            return false;
-        }
+class ZAxis : public Cube, public Drawable {
+public:
+    Shader shader{};
+    Material material{};
 
-        while (1) {
-
-            char lineHeader[128];
-            // read the first word of the line
-            int res = fscanf(file, "%s", lineHeader);
-            if (res == EOF)
-                break; // EOF = End Of File. Quit the loop.
-
-            // else : parse lineHeader
-
-            if (strcmp(lineHeader, "v") == 0) {
-                glm::vec3 vertex;
-                res = fscanf(file, "%f %f %f\n", &vertex.x, &vertex.y, &vertex.z);
-
-                temp_vertices.push_back(vertex);
-            }
-            else if (strcmp(lineHeader, "vt") == 0) {
-                glm::vec2 uv;
-                res = fscanf(file, "%f %f\n", &uv.x, &uv.y);
-                if (res != 2) {
-                    printf("Missing uv information!\n");
-                }
-                uv.y = -uv.y; // Invert V coordinate since we will only use DDS texture, which are inverted. Remove if you want to use TGA or BMP loaders.
-                temp_uvs.push_back(uv);
-            }
-            else if (strcmp(lineHeader, "vn") == 0) {
-                glm::vec3 normal;
-                res = fscanf(file, "%f %f %f\n", &normal.x, &normal.y, &normal.z);
-                if (res != 3) {
-                    printf("Missing normal information!\n");
-                }
-                temp_normals.push_back(normal);
-            }
-            else if (strcmp(lineHeader, "f") == 0) {
-                char* getRes;
-                int vertexIndex[3], uvIndex[3], normalIndex[3];
-                bool uv = true;
-                bool norm = true;
-                char line[128];
-                getRes = fgets(line, 128, file);
-                if (getRes == 0) {
-                    printf("incomplete face\n");
-                }
-
-                //vertex, uv, norm
-                int matches = sscanf(line, "%d/%d/%d %d/%d/%d %d/%d/%d\n", &vertexIndex[0], &uvIndex[0], &normalIndex[0], &vertexIndex[1], &uvIndex[1], &normalIndex[1], &vertexIndex[2], &uvIndex[2], &normalIndex[2]);
-                if (matches != 9) {
-                    //vertex, norm
-                    matches = sscanf(line, "%d//%d %d//%d %d//%d\n", &vertexIndex[0], &normalIndex[0], &vertexIndex[1], &normalIndex[1], &vertexIndex[2], &normalIndex[2]);
-                    if (matches != 6) {
-                        //vertex, uv
-                        matches = sscanf(line, "%d/%d %d/%d %d/%d\n", &vertexIndex[0], &uvIndex[0], &vertexIndex[1], &uvIndex[1], &vertexIndex[2], &uvIndex[2]);
-                        if (matches != 6) {
-                            //vertex
-                            matches = sscanf(line, "%d %d %d\n", &vertexIndex[0], &vertexIndex[1], &vertexIndex[2]);
-                            if (matches != 3) {
-                                printf("File can't be read by our simple parser. 'f' format expected: d/d/d d/d/d d/d/d || d/d d/d d/d || d//d d//d d//d\n");
-                                printf("Character at %ld", ftell(file));
-                                return false;
-                            }
-                            uv, norm = false;
-                        }
-                        else {
-                            norm = false;
-                        }
-                    }
-                    else {
-                        uv = false;
-                    }
-                }
-                vertexIndices.push_back(abs(vertexIndex[0]) - 1);
-                vertexIndices.push_back(abs(vertexIndex[1]) - 1);
-                vertexIndices.push_back(abs(vertexIndex[2]) - 1);
-                if (norm) {
-                    normalIndices.push_back(abs(normalIndex[0]) - 1);
-                    normalIndices.push_back(abs(normalIndex[1]) - 1);
-                    normalIndices.push_back(abs(normalIndex[2]) - 1);
-                }
-                if (uv) {
-                    uvIndices.push_back(abs(uvIndex[0]) - 1);
-                    uvIndices.push_back(abs(uvIndex[1]) - 1);
-                    uvIndices.push_back(abs(uvIndex[2]) - 1);
-                }
-            }
-            else {
-                char clear[1000];
-                char* getsRes = fgets(clear, 1000, file);
-            }
-        }
-        if (normalIndices.size() != 0)
-            out_normals.resize(temp_normals.size());
-        if (uvIndices.size() != 0)
-            out_uvs.resize(temp_normals.size());
-        for (unsigned int i = 0; i < vertexIndices.size(); i++) {
-            int vi = vertexIndices[i];
-            if (normalIndices.size() != 0) {
-                int ni = normalIndices[i];
-                out_normals[vi] = temp_normals[ni];
-            }
-            if (uvIndices.size() != 0 && i < uvIndices.size()) {
-                int ui = uvIndices[i];
-                out_uvs[vi] = temp_uvs[ui];
-            }
-        }
-
-        return true;
+    ZAxis() {
+        this->shader = Shader("../VS2017/resources/shaders/ModelVertexShader.glsl",
+            "../VS2017/resources/shaders/ModelFragmentShader.glsl",
+            "../VS2017/resources/textures/green.png");
+        this->material = METALLIC;
     }
 
+    ~ZAxis() override {
+        glDeleteProgram(shader.ID);
+    }
+
+    static glm::mat4
+        scaleandTranslate(float xTran, float yTran, float zTran, float xScale, float yScale, float zScale, glm::mat4 unitmat4) {
 
 
+        glm::mat4 output = glm::translate(unitmat4, glm::vec3(xTran, yTran, zTran));
+        output = glm::scale(output, glm::vec3(xScale, yScale, zScale));
+        return output;
 
-    GLuint setupModelEBO(std::string path, int& vertexCount) {
-        vector<int> vertexIndices;
-        // The contiguous sets of three indices of vertices, normals and UVs, used to
-        // make a triangle
-        vector<glm::vec3> vertices;
-        vector<glm::vec3> normals;
-        vector<glm::vec2> UVs;
+    }
 
-        // read the vertices from the cube.obj file
-        // We won't be needing the normals or UVs for this program
-        loadObject(path.c_str(), vertexIndices, vertices, normals, UVs);
+    void
+        draw(const MVPL mvpl, LightParams lp, const glm::vec3& cameraPos) const override {
 
-        GLuint localVAO;
-        glGenVertexArrays(1, &localVAO);
-        glBindVertexArray(localVAO);  // Becomes active VAO
-        // Bind the Vertex Array Object first, then bind and set vertex buffer(s) and
-        // attribute pointer(s).
+        shader.use();
+        shader.setBool("shadows", shadows);
+        shader.setBool("textures", textures);
+        shader.setMat4("model", glm::translate(mvpl.model, getPosition()) * getTransform());
+        shader.setMat4("view", mvpl.view);
+        shader.setMat4("projection", mvpl.projection);
+        shader.setMat4("lightSpaceMatrix", mvpl.lsm);
+        //shader.setMat4("lightSpaceMatrix", glm::translate(mvpl.lsm, getPosition()) * getTransform());
+        shader.setVec3("viewPos", cameraPos);
+        shader.setVec3("light.position", lp.lightPos);
+        shader.setVec3("light.ambient", lp.lightColor * 0.5f);
+        shader.setVec3("light.diffuse", lp.lightColor * 0.2f);
+        shader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
+        // material properties
+        shader.setVec3("material.ambient", material.ambient);
+        shader.setVec3("material.diffuse", material.diffuse);
+        shader.setVec3("material.specular", material.specular);
+        shader.setFloat("material.shininess", material.shininess);
 
-        // Vertex VBO setup
-        GLuint vertices_VBO;
-        glGenBuffers(1, &vertices_VBO);
-        glBindBuffer(GL_ARRAY_BUFFER, vertices_VBO);
-        glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(glm::vec3),
-            &vertices.front(), GL_STATIC_DRAW);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat),
-            (GLvoid*)0);
-        glEnableVertexAttribArray(0);
+        shader.setInt("shadowMap", 1);
 
-        // Normals VBO setup
-        GLuint normals_VBO;
-        glGenBuffers(1, &normals_VBO);
-        glBindBuffer(GL_ARRAY_BUFFER, normals_VBO);
-        glBufferData(GL_ARRAY_BUFFER, normals.size() * sizeof(glm::vec3),
-            &normals.front(), GL_STATIC_DRAW);
-        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat),
-            (GLvoid*)0);
-        glEnableVertexAttribArray(1);
+        glBindVertexArray(vao);
 
-        // UVs VBO setup
-        GLuint uvs_VBO;
-        glGenBuffers(1, &uvs_VBO);
-        glBindBuffer(GL_ARRAY_BUFFER, uvs_VBO);
-        glBufferData(GL_ARRAY_BUFFER, UVs.size() * sizeof(glm::vec2), &UVs.front(),
-            GL_STATIC_DRAW);
-        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat),
-            (GLvoid*)0);
-        glEnableVertexAttribArray(2);
+        glm::mat4 unitmat4(1);
+        glm::mat4 input(1);
+        glm::mat4 vertical = glm::scale(unitmat4, glm::vec3(0.25f, 0.25f, 3.0f));
 
-        // EBO setup
-        GLuint EBO;
-        glGenBuffers(1, &EBO);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, vertexIndices.size() * sizeof(int),
-            &vertexIndices.front(), GL_STATIC_DRAW);
+        shader.setMat4("local_transform", scaleandTranslate(0.0, 0.0, 0.0, 1.0, 1.0, 1.0, vertical));
+        glDrawArrays(renderMode, 0, size);
 
-        glBindVertexArray(0);
-        // Unbind VAO (it's always a good thing to unbind any buffer/array to prevent
-        // strange bugs), remember: do NOT unbind the EBO, keep it bound to this VAO
-        vertexCount = vertexIndices.size();
-        return localVAO;
+
+    }
+
+    void drawShadows(const glm::mat4& model, Shader& depthShader, const glm::mat4& lsm) const override {
+
+        depthShader.setMat4("lightSpaceMatrix", glm::translate(lsm, getPosition()) * getTransform());
+        depthShader.setMat4("model", glm::translate(model, getPosition()) * getTransform());
+        //depthShader.setMat4("lightSpaceMatrix", lsm);
+        //depthShader.setMat4("model", model);
+
+        glBindVertexArray(vao);
+
+        glm::mat4 unitmat4(1);
+
+
+        glm::mat4 horizontal = glm::scale(unitmat4, glm::vec3(1.0f, 0.5f, 0.25f));
+        glm::mat4 vertical = glm::scale(unitmat4, glm::vec3(0.5f, 1.0f, 0.25f));
+
+
+        /* M ------ */
+
+        //base
+        shader.setMat4("local_transform", scaleandTranslate(0.0, 0.0, 0.0, 1.0, 1.0, 1.0, vertical));
+        glDrawArrays(renderMode, 0, size);
+
+        //leftside
+        shader.setMat4("local_transform", scaleandTranslate(0.0, 1.10f, 0.0, 1.0, 1.0, 1.0, vertical));
+        glDrawArrays(renderMode, 0, size);
+
+        //middle
+        shader.setMat4("local_transform", scaleandTranslate(0.5, 3.85f, 0.0, 1.0, 1.0, 1.0, horizontal));
+        glDrawArrays(renderMode, 0, size);
+
+        //rightside
+        shader.setMat4("local_transform", scaleandTranslate(1.75, 3.85f, 0.0, 1.0, 1.0, 1.0, horizontal));
+        glDrawArrays(renderMode, 0, size);
+
+        //top
+        shader.setMat4("local_transform", scaleandTranslate(2.75, 0.0, 0.0, 1.0, 1.0, 1.0, vertical));
+        glDrawArrays(renderMode, 0, size);
+
+        shader.setMat4("local_transform", scaleandTranslate(2.75, 1.10f, 0.0, 1.0, 1.0, 1.0, vertical));
+        glDrawArrays(renderMode, 0, size);
+        /* -------- */
+
+        shader.setMat4("local_transform", scaleandTranslate(5.25, 0.0, 0.0, 1.0, 1.0, 1.0, vertical));
+        glDrawArrays(renderMode, 0, size);
+        /* -------- */
+
+        shader.setMat4("local_transform", scaleandTranslate(5.25, 1.10f, 0.0, 1.0, 1.0, 1.0, vertical));
+        glDrawArrays(renderMode, 0, size);
     }
 
 };
@@ -698,7 +633,130 @@ public:
 
 
 
+
+class XAxis : public Cube, public Drawable {
+public:
+    Shader shader{};
+    Material material{};
+
+    XAxis() {
+        this->shader = Shader("../VS2017/resources/shaders/ModelVertexShader.glsl",
+            "../VS2017/resources/shaders/ModelFragmentShader.glsl",
+            "../VS2017/resources/textures/bubble.jpg");
+        this->material = METALLIC;
+    }
+
+    ~XAxis() override {
+        glDeleteProgram(shader.ID);
+    }
+
+    static glm::mat4
+        scaleandTranslate(float xTran, float yTran, float zTran, float xScale, float yScale, float zScale, glm::mat4 unitmat4) {
+
+
+        glm::mat4 output = glm::translate(unitmat4, glm::vec3(xTran, yTran, zTran));
+        output = glm::scale(output, glm::vec3(xScale, yScale, zScale));
+        return output;
+
+    }
+
+    void
+        draw(const MVPL mvpl, LightParams lp, const glm::vec3& cameraPos) const override {
+
+        shader.use();
+        shader.setBool("shadows", shadows);
+        shader.setBool("textures", textures);
+        shader.setMat4("model", glm::translate(mvpl.model, getPosition()) * getTransform());
+        shader.setMat4("view", mvpl.view);
+        shader.setMat4("projection", mvpl.projection);
+        shader.setMat4("lightSpaceMatrix", mvpl.lsm);
+        //shader.setMat4("lightSpaceMatrix", glm::translate(mvpl.lsm, getPosition()) * getTransform());
+        shader.setVec3("viewPos", cameraPos);
+        shader.setVec3("light.position", lp.lightPos);
+        shader.setVec3("light.ambient", lp.lightColor * 0.5f);
+        shader.setVec3("light.diffuse", lp.lightColor * 0.2f);
+        shader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
+        // material properties
+        shader.setVec3("material.ambient", material.ambient);
+        shader.setVec3("material.diffuse", material.diffuse);
+        shader.setVec3("material.specular", material.specular);
+        shader.setFloat("material.shininess", material.shininess);
+
+        shader.setInt("shadowMap", 1);
+
+        glBindVertexArray(vao);
+
+        glm::mat4 unitmat4(1);
+        glm::mat4 input(1);
+        glm::mat4 vertical = glm::scale(unitmat4, glm::vec3(3.0f, 0.25f, 0.25));
+
+        shader.setMat4("local_transform", scaleandTranslate(0.0, 0.0, 0.0, 1.0, 1.0, 1.0, vertical));
+        glDrawArrays(renderMode, 0, size);
+
+
+    }
+
+    void drawShadows(const glm::mat4& model, Shader& depthShader, const glm::mat4& lsm) const override {
+
+        depthShader.setMat4("lightSpaceMatrix", glm::translate(lsm, getPosition()) * getTransform());
+        depthShader.setMat4("model", glm::translate(model, getPosition()) * getTransform());
+        //depthShader.setMat4("lightSpaceMatrix", lsm);
+        //depthShader.setMat4("model", model);
+
+        glBindVertexArray(vao);
+
+        glm::mat4 unitmat4(1);
+
+
+        glm::mat4 horizontal = glm::scale(unitmat4, glm::vec3(1.0f, 0.5f, 0.25f));
+        glm::mat4 vertical = glm::scale(unitmat4, glm::vec3(0.5f, 1.0f, 0.25f));
+
+
+        /* M ------ */
+
+        //base
+        shader.setMat4("local_transform", scaleandTranslate(0.0, 0.0, 0.0, 1.0, 1.0, 1.0, vertical));
+        glDrawArrays(renderMode, 0, size);
+
+        //leftside
+        shader.setMat4("local_transform", scaleandTranslate(0.0, 1.10f, 0.0, 1.0, 1.0, 1.0, vertical));
+        glDrawArrays(renderMode, 0, size);
+
+        //middle
+        shader.setMat4("local_transform", scaleandTranslate(0.5, 3.85f, 0.0, 1.0, 1.0, 1.0, horizontal));
+        glDrawArrays(renderMode, 0, size);
+
+        //rightside
+        shader.setMat4("local_transform", scaleandTranslate(1.75, 3.85f, 0.0, 1.0, 1.0, 1.0, horizontal));
+        glDrawArrays(renderMode, 0, size);
+
+        //top
+        shader.setMat4("local_transform", scaleandTranslate(2.75, 0.0, 0.0, 1.0, 1.0, 1.0, vertical));
+        glDrawArrays(renderMode, 0, size);
+
+        shader.setMat4("local_transform", scaleandTranslate(2.75, 1.10f, 0.0, 1.0, 1.0, 1.0, vertical));
+        glDrawArrays(renderMode, 0, size);
+        /* -------- */
+
+        shader.setMat4("local_transform", scaleandTranslate(5.25, 0.0, 0.0, 1.0, 1.0, 1.0, vertical));
+        glDrawArrays(renderMode, 0, size);
+        /* -------- */
+
+        shader.setMat4("local_transform", scaleandTranslate(5.25, 1.10f, 0.0, 1.0, 1.0, 1.0, vertical));
+        glDrawArrays(renderMode, 0, size);
+    }
+
+};
+
+
+
+
+
+
 /// Class that holds necessary data to draw a sphere
+//which will be used as a sky box
+
+
 class Sphere : public Drawable {
 private:
     Shader shader{};
@@ -719,7 +777,7 @@ public:
 
         //need to create interleaved ones
         this->shader = Shader("../VS2017/resources/shaders/SphereVertexShader.glsl", "../VS2017/resources/shaders/SphereFragmentShader.glsl",
-                              "../VS2017/resources/textures/bubble.jpg");
+                              "../VS2017/resources/textures/myDog.jpg");
 
         //runs the function to generate verts
         createVertices();
@@ -794,19 +852,19 @@ public:
 
     void drawShadows(const glm::mat4 &model, Shader &depthShader, const glm::mat4 &lsm) const override {
 
-        depthShader.setMat4("lightSpaceMatrix", glm::translate(lsm, getPosition()) * getTransform());
-        depthShader.setMat4("model", glm::translate(model, getPosition()) * getTransform());
+       // depthShader.setMat4("lightSpaceMatrix", glm::translate(lsm, getPosition()) * getTransform());
+       // depthShader.setMat4("model", glm::translate(model, getPosition()) * getTransform());
         //depthShader.setMat4("lightSpaceMatrix", lsm);
         //depthShader.setMat4("model", model);
-
-        glBindVertexArray(vao);
+        
+     //   glBindVertexArray(vao);
 
         //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
         // draw a sphere with VBO
-        glDrawElements(GL_TRIANGLES,                    // primitive type
-                       indices.size(),          // # of indices
-                       GL_UNSIGNED_INT,                 // data type
-                       (void *) nullptr);
+       // glDrawElements(GL_TRIANGLES,                    // primitive type
+                      // indices.size(),          // # of indices
+                   //    GL_UNSIGNED_INT,                 // data type
+                   //    (void *) nullptr);
 
         //glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     }
@@ -1030,491 +1088,7 @@ public:
     };
 };
 
-/// The world Axis
-class Axis : public Drawable {
-private:
-    Shader shader{};
-    GLuint vao{}, vbo{};
-public:
 
-    Axis() {
-        shader = Shader("../VS2017/resources/shaders/AxisVertexShader.glsl", "../VS2017/resources/shaders/AxisFragmentShader.glsl");
-        const GLfloat arrowLines[] =
-                {
-                        //read row by row
-                        //two arrowLines coresponding to a line
-                        //(first three pos)(second 3 are color)
-
-                        //Xaxis
-                        //set to blue
-                        //main line
-                        0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f,
-                        5.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f,
-                        //Zaxis
-                        //set to green
-                        0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f,
-                        0.0f, 0.0f, 5.0f, 0.0f, 1.0f, 0.0f, 1.0f,
-
-                        //Yaxis
-                        //Set to red
-                        0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f,
-                        0.0f, 5.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f,
-
-                };
-
-        //creates a localVBO and then connects that to to the arrowLines
-
-        //binding the buffers
-        glGenVertexArrays(1, &vao);
-        glGenBuffers(1, &vbo);
-        glBindVertexArray(vao);
-        glBindBuffer(GL_ARRAY_BUFFER, vbo);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(arrowLines), arrowLines, GL_STATIC_DRAW);
-
-        //arrowLines are stored in location 0 with three values
-        glEnableVertexAttribArray(0);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 7 * sizeof(float), (void *) nullptr);
-
-        //colors are stored in the location 1 with 4 values
-        glEnableVertexAttribArray(1);
-        glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 7 * sizeof(float), (void *) (3 * sizeof(float)));
-
-        glBindVertexArray(0);
-    };
-
-    ~Axis() override {
-        glDeleteProgram(shader.ID);
-        glDeleteVertexArrays(1, &vao);
-        glDeleteBuffers(1, &vbo);
-    }
-
-    //draw function takes in the mvp matrix from the current scene and applies them to local shader
-    void
-    draw(const MVPL mvpl, LightParams lp, const glm::vec3 &cameraPos) const override {
-        //enabling the shader to be used
-        shader.use();
-        shader.setMat4("model", mvpl.model * getTransform());
-        shader.setMat4("view", mvpl.view);
-        shader.setMat4("projection", mvpl.projection);
-
-        glLineWidth(3.0f);
-        //binding array that was created in constructor
-        glBindVertexArray(this->vao);
-
-        glDrawArrays(GL_LINES, 0, 6);
-        glDrawArrays(GL_LINES, 6, 6);
-        glDrawArrays(GL_LINES, 12, 6);
-        glLineWidth(1.0f);
-        //releasing the vertex array
-        glBindVertexArray(0);
-    };
-
-    void drawShadows(const glm::mat4 &model, Shader &depthShader, const glm::mat4 &lsm) const override {
-        // Empty on purpose
-    }
-};
-
-
-/// Model for a student
-class ModelM : public Cube, public Drawable {
-public:
-    Shader shader{};
-    Material material{};
-
-    ModelM() {
-        this->shader = Shader("../VS2017/resources/shaders/ModelVertexShader.glsl",
-            "../VS2017/resources/shaders/ModelFragmentShader.glsl",
-            "../VS2017/resources/textures/metallic_surface.png");
-        this->material = METALLIC;
-    }
-
-    ~ModelM() override {
-        glDeleteProgram(shader.ID);
-    }
-
-    static glm::mat4
-        scaleandTranslate(float xTran, float yTran, float zTran, float xScale, float yScale, float zScale, glm::mat4 unitmat4) {
-
-
-        glm::mat4 output = glm::translate(unitmat4, glm::vec3(xTran, yTran, zTran));
-        output = glm::scale(output, glm::vec3(xScale, yScale, zScale));
-        return output;
-
-    }
-
-    void
-        draw(const MVPL mvpl, LightParams lp, const glm::vec3& cameraPos) const override {
-
-        shader.use();
-        shader.setBool("shadows", shadows);
-        shader.setBool("textures", textures);
-        shader.setMat4("model", glm::translate(mvpl.model, getPosition()) * getTransform());
-        shader.setMat4("view", mvpl.view);
-        shader.setMat4("projection", mvpl.projection);
-        shader.setMat4("lightSpaceMatrix", mvpl.lsm);
-        //shader.setMat4("lightSpaceMatrix", glm::translate(mvpl.lsm, getPosition()) * getTransform());
-        shader.setVec3("viewPos", cameraPos);
-        shader.setVec3("light.position", lp.lightPos);
-        shader.setVec3("light.ambient", lp.lightColor * 0.5f);
-        shader.setVec3("light.diffuse", lp.lightColor * 0.2f);
-        shader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
-        // material properties
-        shader.setVec3("material.ambient", material.ambient);
-        shader.setVec3("material.diffuse", material.diffuse);
-        shader.setVec3("material.specular", material.specular);
-        shader.setFloat("material.shininess", material.shininess);
-
-        shader.setInt("shadowMap", 1);
-
-        glBindVertexArray(vao);
-
-        glm::mat4 unitmat4(1);
-        glm::mat4 input(1);
-
-        glm::mat4 horizontal = glm::scale(unitmat4, glm::vec3(1.0f, 0.5f, 0.25f));
-        glm::mat4 vertical = glm::scale(unitmat4, glm::vec3(0.5f, 1.0f, 0.25f));
-
-
-        /* M ------ */
-
-        //base
-        shader.setMat4("local_transform", scaleandTranslate(0.0, 0.0, 0.0, 1.0, 1.0, 1.0, vertical));
-        glDrawArrays(renderMode, 0, size);
-
-        //leftside
-        shader.setMat4("local_transform", scaleandTranslate(0.0, 1.10f, 0.0, 1.0, 1.0, 1.0, vertical));
-        glDrawArrays(renderMode, 0, size);
-
-        //middle
-        shader.setMat4("local_transform", scaleandTranslate(0.5, 3.85f, 0.0, 1.0, 1.0, 1.0, horizontal));
-        glDrawArrays(renderMode, 0, size);
-
-        //rightside
-        shader.setMat4("local_transform", scaleandTranslate(1.75, 3.85f, 0.0, 1.0, 1.0, 1.0, horizontal));
-        glDrawArrays(renderMode, 0, size);
-
-        //top
-        shader.setMat4("local_transform", scaleandTranslate(2.75, 0.0, 0.0, 1.0, 1.0, 1.0, vertical));
-        glDrawArrays(renderMode, 0, size);
-
-        shader.setMat4("local_transform", scaleandTranslate(2.75, 1.10f, 0.0, 1.0, 1.0, 1.0, vertical));
-        glDrawArrays(renderMode, 0, size);
-        /* -------- */
-
-        shader.setMat4("local_transform", scaleandTranslate(5.25, 0.0, 0.0, 1.0, 1.0, 1.0, vertical));
-        glDrawArrays(renderMode, 0, size);
-        /* -------- */
-
-        shader.setMat4("local_transform", scaleandTranslate(5.25, 1.10f, 0.0, 1.0, 1.0, 1.0, vertical));
-        glDrawArrays(renderMode, 0, size);
-        /* -------- */
-        /* -------- */
-    }
-
-    void drawShadows(const glm::mat4& model, Shader& depthShader, const glm::mat4& lsm) const override {
-
-        depthShader.setMat4("lightSpaceMatrix", glm::translate(lsm, getPosition()) * getTransform());
-        depthShader.setMat4("model", glm::translate(model, getPosition()) * getTransform());
-        //depthShader.setMat4("lightSpaceMatrix", lsm);
-        //depthShader.setMat4("model", model);
-
-        glBindVertexArray(vao);
-
-        glm::mat4 unitmat4(1);
-
-
-        glm::mat4 horizontal = glm::scale(unitmat4, glm::vec3(1.0f, 0.5f, 0.25f));
-        glm::mat4 vertical = glm::scale(unitmat4, glm::vec3(0.5f, 1.0f, 0.25f));
-
-
-        /* M ------ */
-
-        //base
-        shader.setMat4("local_transform", scaleandTranslate(0.0, 0.0, 0.0, 1.0, 1.0, 1.0, vertical));
-        glDrawArrays(renderMode, 0, size);
-
-        //leftside
-        shader.setMat4("local_transform", scaleandTranslate(0.0, 1.10f, 0.0, 1.0, 1.0, 1.0, vertical));
-        glDrawArrays(renderMode, 0, size);
-
-        //middle
-        shader.setMat4("local_transform", scaleandTranslate(0.5, 3.85f, 0.0, 1.0, 1.0, 1.0, horizontal));
-        glDrawArrays(renderMode, 0, size);
-
-        //rightside
-        shader.setMat4("local_transform", scaleandTranslate(1.75, 3.85f, 0.0, 1.0, 1.0, 1.0, horizontal));
-        glDrawArrays(renderMode, 0, size);
-
-        //top
-        shader.setMat4("local_transform", scaleandTranslate(2.75, 0.0, 0.0, 1.0, 1.0, 1.0, vertical));
-        glDrawArrays(renderMode, 0, size);
-
-        shader.setMat4("local_transform", scaleandTranslate(2.75, 1.10f, 0.0, 1.0, 1.0, 1.0, vertical));
-        glDrawArrays(renderMode, 0, size);
-        /* -------- */
-
-        shader.setMat4("local_transform", scaleandTranslate(5.25, 0.0, 0.0, 1.0, 1.0, 1.0, vertical));
-        glDrawArrays(renderMode, 0, size);
-        /* -------- */
-
-        shader.setMat4("local_transform", scaleandTranslate(5.25, 1.10f, 0.0, 1.0, 1.0, 1.0, vertical));
-        glDrawArrays(renderMode, 0, size);
-    }
-
-};
-
-
-/// Model for a student
-class ModelC : public Cube, public Drawable {
-public:
-    Shader shader{};
-    Material material{};
-
-    ModelC() {
-        this->shader = Shader("../VS2017/resources/shaders/ModelVertexShader.glsl",
-            "../VS2017/resources/shaders/ModelFragmentShader.glsl",
-            "../VS2017/resources/textures/metallic_surface.png");
-        this->material = METALLIC;
-    }
-
-    ~ModelC() override {
-        glDeleteProgram(shader.ID);
-    }
-
-    static glm::mat4
-        scaleandTranslate(float xTran, float yTran, float zTran, float xScale, float yScale, float zScale, glm::mat4 unitmat4) {
-
-
-        glm::mat4 output = glm::translate(unitmat4, glm::vec3(xTran, yTran, zTran));
-        output = glm::scale(output, glm::vec3(xScale, yScale, zScale));
-        return output;
-
-    }
-
-    void
-        draw(const MVPL mvpl, LightParams lp, const glm::vec3& cameraPos) const override {
-
-        shader.use();
-        shader.setBool("shadows", shadows);
-        shader.setBool("textures", textures);
-        shader.setMat4("model", glm::translate(mvpl.model, getPosition()) * getTransform());
-        shader.setMat4("view", mvpl.view);
-        shader.setMat4("projection", mvpl.projection);
-        shader.setMat4("lightSpaceMatrix", mvpl.lsm);
-        //shader.setMat4("lightSpaceMatrix", glm::translate(mvpl.lsm, getPosition()) * getTransform());
-        shader.setVec3("viewPos", cameraPos);
-        shader.setVec3("light.position", lp.lightPos);
-        shader.setVec3("light.ambient", lp.lightColor * 0.5f);
-        shader.setVec3("light.diffuse", lp.lightColor * 0.2f);
-        shader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
-        // material properties
-        shader.setVec3("material.ambient", material.ambient);
-        shader.setVec3("material.diffuse", material.diffuse);
-        shader.setVec3("material.specular", material.specular);
-        shader.setFloat("material.shininess", material.shininess);
-
-        shader.setInt("shadowMap", 1);
-
-        glBindVertexArray(vao);
-
-        glm::mat4 unitmat4(1);
-        glm::mat4 input(1);
-
-        glm::mat4 horizontal = glm::scale(unitmat4, glm::vec3(1.0f, 0.5f, 0.25f));
-        glm::mat4 vertical = glm::scale(unitmat4, glm::vec3(0.5f, 1.0f, 0.25f));
-
-
-        /* M ------ */
-
-        //base
-        shader.setMat4("local_transform", scaleandTranslate(0.0, 0.15, 0.0, 1.0, 1.0, 1.0, vertical));
-        glDrawArrays(renderMode, 0, size);
-
-        //leftside
-        shader.setMat4("local_transform", scaleandTranslate(0.0, 1.25f, 0.0, 1.0, 1.0, 1.0, vertical));
-        glDrawArrays(renderMode, 0, size);
-
-        //middle
-        shader.setMat4("local_transform", scaleandTranslate(0.5, 3.85f, 0.0, 1.0, 1.0, 1.0, horizontal));
-        glDrawArrays(renderMode, 0, size);
-
-        //rightside
-        shader.setMat4("local_transform", scaleandTranslate(0.5, 0.0f, 0.0, 1.0, 1.0, 1.0, horizontal));
-        glDrawArrays(renderMode, 0, size);
-     
-        /* -------- */
-        /* -------- */
-    }
-
-    void drawShadows(const glm::mat4& model, Shader& depthShader, const glm::mat4& lsm) const override {
-
-
-        depthShader.setMat4("lightSpaceMatrix", glm::translate(lsm, getPosition()) * getTransform());
-        depthShader.setMat4("model", glm::translate(model, getPosition()) * getTransform());
-        //depthShader.setMat4("lightSpaceMatrix", lsm);
-        //depthShader.setMat4("model", model);
-
-        glBindVertexArray(vao);
-
-        glm::mat4 unitmat4(1);
-
-
-        glm::mat4 horizontal = glm::scale(unitmat4, glm::vec3(1.0f, 0.5f, 0.25f));
-        glm::mat4 vertical = glm::scale(unitmat4, glm::vec3(0.5f, 1.0f, 0.25f));
-
-
-        /* C ------ */
-
-        shader.setMat4("local_transform", scaleandTranslate(0.0, 0.15, 0.0, 1.0, 1.0, 1.0, vertical));
-        glDrawArrays(renderMode, 0, size);
-
-        //leftside
-        shader.setMat4("local_transform", scaleandTranslate(0.0, 1.25f, 0.0, 1.0, 1.0, 1.0, vertical));
-        glDrawArrays(renderMode, 0, size);
-
-        //middle
-        shader.setMat4("local_transform", scaleandTranslate(0.5, 3.85f, 0.0, 1.0, 1.0, 1.0, horizontal));
-        glDrawArrays(renderMode, 0, size);
-
-        //rightside
-        shader.setMat4("local_transform", scaleandTranslate(0.5, 0.0f, 0.0, 1.0, 1.0, 1.0, horizontal));
-        glDrawArrays(renderMode, 0, size);
-    }
-
-};
-
-
-
-
-
-
-
-/// Model for a student
-class ModelN : public Cube, public Drawable {
-public:
-    Shader shader{};
-    Material material{};
-
-    ModelN() {
-        this->shader = Shader("../VS2017/resources/shaders/ModelVertexShader.glsl",
-            "../VS2017/resources/shaders/ModelFragmentShader.glsl",
-            "../VS2017/resources/textures/metallic_surface.png");
-        this->material = METALLIC;
-    }
-
-    ~ModelN() override {
-        glDeleteProgram(shader.ID);
-    }
-
-    static glm::mat4
-        scaleandTranslate(float xTran, float yTran, float zTran, float xScale, float yScale, float zScale, glm::mat4 unitmat4) {
-
-
-        glm::mat4 output = glm::translate(unitmat4, glm::vec3(xTran, yTran, zTran));
-        output = glm::scale(output, glm::vec3(xScale, yScale, zScale));
-        return output;
-
-    }
-
-    void
-        draw(const MVPL mvpl, LightParams lp, const glm::vec3& cameraPos) const override {
-
-        shader.use();
-        shader.setBool("shadows", shadows);
-        shader.setBool("textures", textures);
-        shader.setMat4("model", glm::translate(mvpl.model, getPosition()) * getTransform());
-        shader.setMat4("view", mvpl.view);
-        shader.setMat4("projection", mvpl.projection);
-        shader.setMat4("lightSpaceMatrix", mvpl.lsm);
-        //shader.setMat4("lightSpaceMatrix", glm::translate(mvpl.lsm, getPosition()) * getTransform());
-        shader.setVec3("viewPos", cameraPos);
-        shader.setVec3("light.position", lp.lightPos);
-        shader.setVec3("light.ambient", lp.lightColor * 0.5f);
-        shader.setVec3("light.diffuse", lp.lightColor * 0.2f);
-        shader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
-        // material properties
-        shader.setVec3("material.ambient", material.ambient);
-        shader.setVec3("material.diffuse", material.diffuse);
-        shader.setVec3("material.specular", material.specular);
-        shader.setFloat("material.shininess", material.shininess);
-
-        shader.setInt("shadowMap", 1);
-
-        glBindVertexArray(vao);
-
-        glm::mat4 unitmat4(1);
-        glm::mat4 input(1);
-
-        glm::mat4 horizontal = glm::scale(unitmat4, glm::vec3(1.0f, 0.5f, 0.25f));
-        glm::mat4 vertical = glm::scale(unitmat4, glm::vec3(0.5f, 1.0f, 0.25f));
-
-
-        /* M ------ */
-
-        //base
-        shader.setMat4("local_transform", scaleandTranslate(0.0, 0.0, 0.0, 1.0, 1.0, 1.0, vertical));
-        glDrawArrays(renderMode, 0, size);
-
-        //leftside
-        shader.setMat4("local_transform", scaleandTranslate(0.0, 1.10f, 0.0, 1.0, 1.0, 1.0, vertical));
-        glDrawArrays(renderMode, 0, size);
-
-        //middle
-        shader.setMat4("local_transform", scaleandTranslate(2.75, 0.0, 0.0, 1.0, 1.0, 1.0, vertical));
-        glDrawArrays(renderMode, 0, size);
-
-        //rightside
-        shader.setMat4("local_transform", scaleandTranslate(2.75, 1.10f, 0.0, 1.0, 1.0, 1.0, vertical));
-        glDrawArrays(renderMode, 0, size);
-
-
-        shader.setMat4("local_transform", scaleandTranslate(0.5, 3.85f, 0.0, 1.0, 1.0, 1.0, horizontal));
-        glDrawArrays(renderMode, 0, size);
-
-        /* -------- */
-        /* -------- */
-    }
-
-    void drawShadows(const glm::mat4& model, Shader& depthShader, const glm::mat4& lsm) const override {
-
-        depthShader.setMat4("lightSpaceMatrix", glm::translate(lsm, getPosition()) * getTransform());
-        depthShader.setMat4("model", glm::translate(model, getPosition()) * getTransform());
-        //depthShader.setMat4("lightSpaceMatrix", lsm);
-        //depthShader.setMat4("model", model);
-
-        glBindVertexArray(vao);
-
-        glm::mat4 unitmat4(1);
-
-
-        glm::mat4 horizontal = glm::scale(unitmat4, glm::vec3(1.0f, 0.5f, 0.25f));
-        glm::mat4 vertical = glm::scale(unitmat4, glm::vec3(0.5f, 1.0f, 0.25f));
-
-
-        /* N ------ */
-     //base
-        shader.setMat4("local_transform", scaleandTranslate(0.0, 0.0, 0.0, 1.0, 1.0, 1.0, vertical));
-        glDrawArrays(renderMode, 0, size);
-
-        //leftside
-        shader.setMat4("local_transform", scaleandTranslate(0.0, 1.10f, 0.0, 1.0, 1.0, 1.0, vertical));
-        glDrawArrays(renderMode, 0, size);
-
-        //middle
-        shader.setMat4("local_transform", scaleandTranslate(2.75, 0.0, 0.0, 1.0, 1.0, 1.0, vertical));
-        glDrawArrays(renderMode, 0, size);
-
-        //rightside
-        shader.setMat4("local_transform", scaleandTranslate(2.75, 1.10f, 0.0, 1.0, 1.0, 1.0, vertical));
-        glDrawArrays(renderMode, 0, size);
-
-
-        shader.setMat4("local_transform", scaleandTranslate(0.5, 3.85f, 0.0, 1.0, 1.0, 1.0, horizontal));
-        glDrawArrays(renderMode, 0, size);
-
-    }
-
-};
 
 
 
@@ -1530,7 +1104,7 @@ public:
     ModelE() {
         this->shader = Shader("../VS2017/resources/shaders/ModelVertexShader.glsl",
             "../VS2017/resources/shaders/ModelFragmentShader.glsl",
-            "../VS2017/resources/textures/metallic_surface.png");
+            "../VS2017/resources/textures/bubble.jpg");
         this->material = METALLIC;
     }
 
@@ -1657,7 +1231,7 @@ public:
     Model8() {
         this->shader = Shader("../VS2017/resources/shaders/ModelVertexShader.glsl",
             "../VS2017/resources/shaders/ModelFragmentShader.glsl",
-            "../VS2017/resources/textures/metallic_surface.png");
+            "../VS2017/resources/textures/crate1_wood.png");
         this->material = METALLIC;
     }
 
@@ -1797,7 +1371,7 @@ public:
     ModelW() {
         this->shader = Shader("../VS2017/resources/shaders/ModelVertexShader.glsl",
             "../VS2017/resources/shaders/ModelFragmentShader.glsl",
-            "../VS2017/resources/textures/metallic_surface.png");
+            "../VS2017/resources/textures/brick.png");
         this->material = METALLIC;
     }
 
@@ -1949,7 +1523,7 @@ public:
     Model7() {
         this->shader = Shader("../VS2017/resources/shaders/ModelVertexShader.glsl",
             "../VS2017/resources/shaders/ModelFragmentShader.glsl",
-            "../VS2017/resources/textures/metallic_surface.png");
+            "../VS2017/resources/textures/grass.png");
         this->material = METALLIC;
     }
 
@@ -2080,958 +1654,15 @@ public:
 
 
 
-/// Model for a student
-class ModelI : public Cube, public Drawable {
-public:
-    Shader shader{};
-    Material material{};
 
-    ModelI() {
-        this->shader = Shader("../VS2017/resources/shaders/ModelVertexShader.glsl",
-            "../VS2017/resources/shaders/ModelFragmentShader.glsl",
-            "../VS2017/resources/textures/metallic_surface.png");
-        this->material = METALLIC;
-    }
 
-    ~ModelI() override {
-        glDeleteProgram(shader.ID);
-    }
 
-    static glm::mat4
-        scaleandTranslate(float xTran, float yTran, float zTran, float xScale, float yScale, float zScale, glm::mat4 unitmat4) {
 
 
-        glm::mat4 output = glm::translate(unitmat4, glm::vec3(xTran, yTran, zTran));
-        output = glm::scale(output, glm::vec3(xScale, yScale, zScale));
-        return output;
 
-    }
 
-    void
-        draw(const MVPL mvpl, LightParams lp, const glm::vec3& cameraPos) const override {
 
-        shader.use();
-        shader.setBool("shadows", shadows);
-        shader.setBool("textures", textures);
-        shader.setMat4("model", glm::translate(mvpl.model, getPosition()) * getTransform());
-        shader.setMat4("view", mvpl.view);
-        shader.setMat4("projection", mvpl.projection);
-        shader.setMat4("lightSpaceMatrix", mvpl.lsm);
-        //shader.setMat4("lightSpaceMatrix", glm::translate(mvpl.lsm, getPosition()) * getTransform());
-        shader.setVec3("viewPos", cameraPos);
-        shader.setVec3("light.position", lp.lightPos);
-        shader.setVec3("light.ambient", lp.lightColor * 0.5f);
-        shader.setVec3("light.diffuse", lp.lightColor * 0.2f);
-        shader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
-        // material properties
-        shader.setVec3("material.ambient", material.ambient);
-        shader.setVec3("material.diffuse", material.diffuse);
-        shader.setVec3("material.specular", material.specular);
-        shader.setFloat("material.shininess", material.shininess);
 
-        shader.setInt("shadowMap", 1);
-
-        glBindVertexArray(vao);
-
-        glm::mat4 unitmat4(1);
-        glm::mat4 input(1);
-
-        glm::mat4 horizontal = glm::scale(unitmat4, glm::vec3(1.0f, 0.5f, 0.25f));
-        glm::mat4 vertical = glm::scale(unitmat4, glm::vec3(0.5f, 1.0f, 0.25f));
-
-
-        /* M ------ */
-
-        //base
-        shader.setMat4("local_transform", scaleandTranslate(1.5, 0.15, 0.0, 1.0, 1.0, 1.0, vertical));
-        glDrawArrays(renderMode, 0, size);
-
-        //leftside
-        shader.setMat4("local_transform", scaleandTranslate(1.5, 1.25f, 0.0, 1.0, 1.0, 1.0, vertical));
-        glDrawArrays(renderMode, 0, size);
-
-        //middle
-        shader.setMat4("local_transform", scaleandTranslate(0.5, 3.85f, 0.0, 1.0, 1.0, 1.0, horizontal));
-        glDrawArrays(renderMode, 0, size);
-
-        //rightside
-        shader.setMat4("local_transform", scaleandTranslate(0.5, 0.0f, 0.0, 1.0, 1.0, 1.0, horizontal));
-        glDrawArrays(renderMode, 0, size);
-
-        /* -------- */
-        /* -------- */
-    }
-
-    void drawShadows(const glm::mat4& model, Shader& depthShader, const glm::mat4& lsm) const override {
-
-        depthShader.setMat4("lightSpaceMatrix", glm::translate(lsm, getPosition()) * getTransform());
-        depthShader.setMat4("model", glm::translate(model, getPosition()) * getTransform());
-        //depthShader.setMat4("lightSpaceMatrix", lsm);
-        //depthShader.setMat4("model", model);
-
-        glBindVertexArray(vao);
-
-        glm::mat4 unitmat4(1);
-
-
-        glm::mat4 horizontal = glm::scale(unitmat4, glm::vec3(1.0f, 0.5f, 0.25f));
-        glm::mat4 vertical = glm::scale(unitmat4, glm::vec3(0.5f, 1.0f, 0.25f));
-
-        /* M ------ */
-
-                //base
-        shader.setMat4("local_transform", scaleandTranslate(1.5, 0.15, 0.0, 1.0, 1.0, 1.0, vertical));
-        glDrawArrays(renderMode, 0, size);
-
-        //leftside
-        shader.setMat4("local_transform", scaleandTranslate(1.5, 1.25f, 0.0, 1.0, 1.0, 1.0, vertical));
-        glDrawArrays(renderMode, 0, size);
-
-        //middle
-        shader.setMat4("local_transform", scaleandTranslate(0.5, 3.85f, 0.0, 1.0, 1.0, 1.0, horizontal));
-        glDrawArrays(renderMode, 0, size);
-
-        //rightside
-        shader.setMat4("local_transform", scaleandTranslate(0.5, 0.0f, 0.0, 1.0, 1.0, 1.0, horizontal));
-        glDrawArrays(renderMode, 0, size);
-
-        /* -------- */
-
-        /* -------- */
-
-    }
-
-};
-
-
-
-/// Model for a student
-class ModelLme : public Cube, public Drawable {
-public:
-    Shader shader{};
-    Material material{};
-
-    ModelLme() {
-        this->shader = Shader("../VS2017/resources/shaders/ModelVertexShader.glsl",
-            "../VS2017/resources/shaders/ModelFragmentShader.glsl",
-            "../VS2017/resources/textures/metallic_surface.png");
-        this->material = METALLIC;
-    }
-
-    ~ModelLme() override {
-        glDeleteProgram(shader.ID);
-    }
-
-    static glm::mat4
-        scaleandTranslate(float xTran, float yTran, float zTran, float xScale, float yScale, float zScale, glm::mat4 unitmat4) {
-
-
-        glm::mat4 output = glm::translate(unitmat4, glm::vec3(xTran, yTran, zTran));
-        output = glm::scale(output, glm::vec3(xScale, yScale, zScale));
-        return output;
-
-    }
-
-    void
-        draw(const MVPL mvpl, LightParams lp, const glm::vec3& cameraPos) const override {
-
-        shader.use();
-        shader.setBool("shadows", shadows);
-        shader.setBool("textures", textures);
-        shader.setMat4("model", glm::translate(mvpl.model, getPosition()) * getTransform());
-        shader.setMat4("view", mvpl.view);
-        shader.setMat4("projection", mvpl.projection);
-        shader.setMat4("lightSpaceMatrix", mvpl.lsm);
-        //shader.setMat4("lightSpaceMatrix", glm::translate(mvpl.lsm, getPosition()) * getTransform());
-        shader.setVec3("viewPos", cameraPos);
-        shader.setVec3("light.position", lp.lightPos);
-        shader.setVec3("light.ambient", lp.lightColor * 0.5f);
-        shader.setVec3("light.diffuse", lp.lightColor * 0.2f);
-        shader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
-        // material properties
-        shader.setVec3("material.ambient", material.ambient);
-        shader.setVec3("material.diffuse", material.diffuse);
-        shader.setVec3("material.specular", material.specular);
-        shader.setFloat("material.shininess", material.shininess);
-
-        shader.setInt("shadowMap", 1);
-
-        glBindVertexArray(vao);
-
-        glm::mat4 unitmat4(1);
-        glm::mat4 input(1);
-
-        glm::mat4 horizontal = glm::scale(unitmat4, glm::vec3(1.0f, 0.5f, 0.25f));
-        glm::mat4 vertical = glm::scale(unitmat4, glm::vec3(0.5f, 1.0f, 0.25f));
-
-
-        /* M ------ */
-
-        //base
-        shader.setMat4("local_transform", scaleandTranslate(0.0, 0.15, 0.0, 1.0, 1.0, 1.0, vertical));
-        glDrawArrays(renderMode, 0, size);
-
-        //leftside
-        shader.setMat4("local_transform", scaleandTranslate(0.0, 1.25f, 0.0, 1.0, 1.0, 1.0, vertical));
-        glDrawArrays(renderMode, 0, size);
-
-        //middle
-        shader.setMat4("local_transform", scaleandTranslate(0.5, 0.0f, 0.0, 1.0, 1.0, 1.0, horizontal));
-        glDrawArrays(renderMode, 0, size);
-
-    
-        /* -------- */
-        /* -------- */
-    }
-
-    void drawShadows(const glm::mat4& model, Shader& depthShader, const glm::mat4& lsm) const override {
-
-        depthShader.setMat4("lightSpaceMatrix", glm::translate(lsm, getPosition()) * getTransform());
-        depthShader.setMat4("model", glm::translate(model, getPosition()) * getTransform());
-        //depthShader.setMat4("lightSpaceMatrix", lsm);
-        //depthShader.setMat4("model", model);
-
-        glBindVertexArray(vao);
-
-        glm::mat4 unitmat4(1);
-
-
-        glm::mat4 horizontal = glm::scale(unitmat4, glm::vec3(1.0f, 0.5f, 0.25f));
-        glm::mat4 vertical = glm::scale(unitmat4, glm::vec3(0.5f, 1.0f, 0.25f));
-
-        /* M ------ */
-
-                //base
-        shader.setMat4("local_transform", scaleandTranslate(1.5, 0.15, 0.0, 1.0, 1.0, 1.0, vertical));
-        glDrawArrays(renderMode, 0, size);
-
-        //leftside
-        shader.setMat4("local_transform", scaleandTranslate(1.5, 1.25f, 0.0, 1.0, 1.0, 1.0, vertical));
-        glDrawArrays(renderMode, 0, size);
-
-        //middle
-        shader.setMat4("local_transform", scaleandTranslate(0.5, 3.85f, 0.0, 1.0, 1.0, 1.0, horizontal));
-        glDrawArrays(renderMode, 0, size);
-
-        //rightside
-        shader.setMat4("local_transform", scaleandTranslate(0.5, 0.0f, 0.0, 1.0, 1.0, 1.0, horizontal));
-        glDrawArrays(renderMode, 0, size);
-
-        /* -------- */
-
-        /* -------- */
-
-    }
-
-};
-
-
-
-
-/// Model for a student
-class ModelL : public Cube, public Drawable {
-public:
-    Shader shader{};
-    Material material{};
-
-    ModelL() {
-        this->shader = Shader("../VS2017/resources/shaders/ModelVertexShader.glsl", "../VS2017/resources/shaders/ModelFragmentShader.glsl",
-                              "../VS2017/resources/textures/crate1_wood.png");
-        this->material = WOOD;
-    }
-
-    ~ModelL() override {
-        glDeleteProgram(shader.ID);
-    }
-
-    void
-    draw(const MVPL mvpl, LightParams lp, const glm::vec3 &cameraPos) const override {
-        glm::mat4 unitmat4(1);
-
-        shader.use();
-        shader.setBool("shadows", shadows);
-        shader.setBool("textures", textures);
-        shader.setMat4("model", glm::translate(mvpl.model, getPosition()) * getTransform());
-        shader.setMat4("view", mvpl.view);
-        shader.setMat4("projection", mvpl.projection);
-        //shader.setMat4("lightSpaceMatrix", mvpl.lsm);
-        shader.setMat4("lightSpaceMatrix", mvpl.lsm);
-        shader.setVec3("viewPos", cameraPos);
-        shader.setVec3("light.position", lp.lightPos);
-        shader.setVec3("light.ambient", lp.lightColor * 0.5f);
-        shader.setVec3("light.diffuse", lp.lightColor * 0.2f);
-        shader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
-        // material properties
-        shader.setVec3("material.ambient", material.ambient);
-        shader.setVec3("material.diffuse", material.diffuse);
-        shader.setVec3("material.specular", material.specular);
-        shader.setFloat("material.shininess", material.shininess);
-
-        shader.setInt("shadowMap", 1);
-
-        glBindVertexArray(vao);
-
-        glDrawArrays(renderMode, 0, size);
-
-        /* L ------ */
-        shader.setMat4("local_transform", glm::scale(unitmat4, glm::vec3(3.0f, 1.0f, 1.0f)));
-        glDrawArrays(renderMode, 0, size);
-
-
-        shader.setMat4("local_transform", glm::scale(unitmat4, glm::vec3(1.0f, 5.0f, 1.0f)));
-        glDrawArrays(renderMode, 0, size);
-        /* -------- */
-    }
-
-    void drawShadows(const glm::mat4 &model, Shader &depthShader, const glm::mat4 &lsm) const override {
-        glm::mat4 unitmat4 = glm::mat4(1.0f);
-
-        depthShader.setMat4("lightSpaceMatrix", glm::translate(lsm, getPosition()) * getTransform());
-        depthShader.setMat4("model", glm::translate(model, getPosition()) * getTransform());
-        //depthShader.setMat4("lightSpaceMatrix", lsm);
-        //depthShader.setMat4("model", model);
-
-        glBindVertexArray(vao);
-
-        glDrawArrays(renderMode, 0, size);
-
-        /* L ------ */
-        shader.setMat4("local_transform", glm::scale(unitmat4, glm::vec3(3.0f, 1.0f, 1.0f)));
-        glDrawArrays(renderMode, 0, size);
-
-        shader.setMat4("local_transform", glm::scale(unitmat4, glm::vec3(1.0f, 5.0f, 1.0f)));
-        glDrawArrays(renderMode, 0, size);
-        /* -------- */
-    }
-};
-
-
-
-/// Model for a student
-class Model3 : public Cube, public Drawable {
-private:
-    Shader shader{};
-    Material material{};
-public:
-
-    Model3() {
-        this->shader = Shader("../VS2017/resources/shaders/ModelVertexShader.glsl", "../VS2017/resources/shaders/ModelFragmentShader.glsl",
-                              "../VS2017/resources/textures/metallic_surface.png");
-        this->material = METALLIC;
-    }
-
-    ~Model3() override {
-        glDeleteProgram(shader.ID);
-    }
-
-    void
-    draw(const MVPL mvpl, LightParams lp, const glm::vec3 &cameraPos) const override {
-
-        shader.use();
-        shader.setBool("shadows", shadows);
-        shader.setBool("textures", textures);
-        shader.setMat4("model", glm::translate(mvpl.model, getPosition()) * getTransform());
-        shader.setMat4("view", mvpl.view);
-        shader.setMat4("projection", mvpl.projection);
-        shader.setMat4("lightSpaceMatrix", mvpl.lsm);
-        //shader.setMat4("lightSpaceMatrix", glm::translate(mvpl.lsm, getPosition()) * getTransform());
-        shader.setVec3("viewPos", cameraPos);
-        shader.setVec3("light.position", lp.lightPos);
-        shader.setVec3("light.ambient", lp.lightColor * 0.5f);
-        shader.setVec3("light.diffuse", lp.lightColor * 0.2f);
-        shader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
-        // material properties
-        shader.setVec3("material.ambient", material.ambient);
-        shader.setVec3("material.diffuse", material.diffuse);
-        shader.setVec3("material.specular", material.specular);
-        shader.setFloat("material.shininess", material.shininess);
-
-        shader.setInt("shadowMap", 1);
-
-        glBindVertexArray(vao);
-
-        glm::mat4 unitmat = glm::mat4(1.0f);
-        glm::mat4 y5 = glm::scale(unitmat, glm::vec3(1.0f, 5.0f, 1.0f));
-        glm::mat4 x2 = glm::scale(unitmat, glm::vec3(2.0f, 1.0f, 1.0f));
-
-        //draw H
-        shader.setMat4("local_transform", y5);
-        glDrawArrays(renderMode, 0, size);
-
-        shader.setMat4("local_transform", glm::translate(y5, glm::vec3(2.0f, 0.0f, 0.0f)));
-        glDrawArrays(renderMode, 0, size);
-
-        shader.setMat4("local_transform", glm::translate(unitmat, glm::vec3(1.0f, 2.0f, 0.0f)));
-        glDrawArrays(renderMode, 0, size);
-
-        //draw 3
-        shader.setMat4("local_transform", glm::translate(y5, glm::vec3(6.0f, 0.0f, 0.0f)));
-        glDrawArrays(renderMode, 0, size);
-
-        shader.setMat4("local_transform", glm::translate(x2, glm::vec3(2.0f, 0.0f, 0.0f)));
-        glDrawArrays(renderMode, 0, size);
-
-        shader.setMat4("local_transform", glm::translate(x2, glm::vec3(2.0f, 2.0f, 0.0f)));
-        glDrawArrays(renderMode, 0, size);
-
-        shader.setMat4("local_transform", glm::translate(x2, glm::vec3(2.0f, 4.0f, 0.0f)));
-        glDrawArrays(renderMode, 0, size);
-    }
-
-    void drawShadows(const glm::mat4 &model, Shader &depthShader, const glm::mat4 &lsm) const override {
-
-        depthShader.setMat4("lightSpaceMatrix", glm::translate(lsm, getPosition()) * getTransform());
-        depthShader.setMat4("model", glm::translate(model, getPosition()) * getTransform());
-        //depthShader.setMat4("lightSpaceMatrix", lsm);
-        //depthShader.setMat4("model", model);
-
-        glBindVertexArray(vao);
-
-        glm::mat4 unitmat = glm::mat4(1.0f);
-        glm::mat4 y5 = glm::scale(unitmat, glm::vec3(1.0f, 5.0f, 1.0f));
-        glm::mat4 x2 = glm::scale(unitmat, glm::vec3(2.0f, 1.0f, 1.0f));
-
-        //draw 3
-        shader.setMat4("local_transform", glm::translate(y5, glm::vec3(6.0f, 0.0f, 0.0f)));
-        glDrawArrays(renderMode, 0, size);
-
-        shader.setMat4("local_transform", glm::translate(x2, glm::vec3(2.0f, 0.0f, 0.0f)));
-        glDrawArrays(renderMode, 0, size);
-
-        shader.setMat4("local_transform", glm::translate(x2, glm::vec3(2.0f, 2.0f, 0.0f)));
-        glDrawArrays(renderMode, 0, size);
-
-        shader.setMat4("local_transform", glm::translate(x2, glm::vec3(2.0f, 4.0f, 0.0f)));
-        glDrawArrays(renderMode, 0, size);
-
-    }
-};
-
-/// Model for a student
-class ModelH : public Cube, public Drawable {
-private:
-    Shader shader{};
-    Material material{};
-public:
-
-    ModelH() {
-        this->shader = Shader("../VS2017/resources/shaders/ModelVertexShader.glsl", "../VS2017/resources/shaders/ModelFragmentShader.glsl",
-                              "../VS2017/resources/textures/crate1_wood.png");
-        this->material = WOOD;
-    }
-
-    ~ModelH() override {
-        glDeleteProgram(shader.ID);
-    }
-
-    void
-    draw(const MVPL mvpl, LightParams lp, const glm::vec3 &cameraPos) const override {
-
-        shader.use();
-        shader.setBool("shadows", shadows);
-        shader.setBool("textures", textures);
-        shader.setMat4("model", glm::translate(mvpl.model, getPosition()) * getTransform());
-        shader.setMat4("view", mvpl.view);
-        shader.setMat4("projection", mvpl.projection);
-        shader.setMat4("lightSpaceMatrix", mvpl.lsm);
-        //shader.setMat4("lightSpaceMatrix", glm::translate(mvpl.lsm, getPosition()) * getTransform());
-        shader.setVec3("viewPos", cameraPos);
-        shader.setVec3("light.position", lp.lightPos);
-        shader.setVec3("light.ambient", lp.lightColor * 0.5f);
-        shader.setVec3("light.diffuse", lp.lightColor * 0.2f);
-        shader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
-        // material properties
-        shader.setVec3("material.ambient", material.ambient);
-        shader.setVec3("material.diffuse", material.diffuse);
-        shader.setVec3("material.specular", material.specular);
-        shader.setFloat("material.shininess", material.shininess);
-
-        shader.setInt("shadowMap", 1);
-
-        glBindVertexArray(vao);
-
-        glm::mat4 unitmat = glm::mat4(1.0f);
-        glm::mat4 y5 = glm::scale(unitmat, glm::vec3(1.0f, 5.0f, 1.0f));
-        glm::mat4 x2 = glm::scale(unitmat, glm::vec3(2.0f, 1.0f, 1.0f));
-
-        //draw H
-        shader.setMat4("local_transform", y5);
-        glDrawArrays(renderMode, 0, size);
-
-        shader.setMat4("local_transform", glm::translate(y5, glm::vec3(2.0f, 0.0f, 0.0f)));
-        glDrawArrays(renderMode, 0, size);
-
-        shader.setMat4("local_transform", glm::translate(unitmat, glm::vec3(1.0f, 2.0f, 0.0f)));
-        glDrawArrays(renderMode, 0, size);
-    }
-
-    void drawShadows(const glm::mat4 &model, Shader &depthShader, const glm::mat4 &lsm) const override {
-
-        depthShader.setMat4("lightSpaceMatrix", glm::translate(lsm, getPosition()) * getTransform());
-        depthShader.setMat4("model", glm::translate(model, getPosition()) * getTransform());
-        //depthShader.setMat4("lightSpaceMatrix", lsm);
-        //depthShader.setMat4("model", model);
-
-        glBindVertexArray(vao);
-
-        glm::mat4 unitmat = glm::mat4(1.0f);
-        glm::mat4 y5 = glm::scale(unitmat, glm::vec3(1.0f, 5.0f, 1.0f));
-        glm::mat4 x2 = glm::scale(unitmat, glm::vec3(2.0f, 1.0f, 1.0f));
-
-        //draw H
-        shader.setMat4("local_transform", y5);
-        glDrawArrays(renderMode, 0, size);
-
-        shader.setMat4("local_transform", glm::translate(y5, glm::vec3(2.0f, 0.0f, 0.0f)));
-        glDrawArrays(renderMode, 0, size);
-
-        shader.setMat4("local_transform", glm::translate(unitmat, glm::vec3(1.0f, 2.0f, 0.0f)));
-        glDrawArrays(renderMode, 0, size);
-    }
-};
-
-/// Model for a student
-class ModelP : public Cube, public Drawable {
-public:
-    Shader shader{};
-    Material material{};
-
-    ModelP() {
-        this->shader = Shader("../VS2017/resources/shaders/ModelVertexShader.glsl",
-                              "../VS2017/resources/shaders/ModelFragmentShader.glsl",
-                              "../VS2017/resources/textures/crate1_wood.png");
-        this->material = WOOD;
-    }
-
-    ~ModelP() override {
-        glDeleteProgram(shader.ID);
-    }
-
-    void
-    draw(const MVPL mvpl, LightParams lp, const glm::vec3 &cameraPos) const override {
-        glm::mat4 unitmat4(1);
-
-        shader.use();
-        shader.setBool("shadows", shadows);
-        shader.setBool("textures", textures);
-        shader.setMat4("model", glm::translate(mvpl.model, getPosition()) * getTransform());
-        shader.setMat4("view", mvpl.view);
-        shader.setMat4("projection", mvpl.projection);
-        shader.setMat4("lightSpaceMatrix", mvpl.lsm);
-        //shader.setMat4("lightSpaceMatrix", glm::translate(mvpl.lsm, getPosition()) * getTransform());
-        shader.setVec3("viewPos", cameraPos);
-        shader.setVec3("light.position", lp.lightPos);
-        shader.setVec3("light.ambient", lp.lightColor * 0.5f);
-        shader.setVec3("light.diffuse", lp.lightColor * 0.2f);
-        shader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
-        // material properties
-        shader.setVec3("material.ambient", material.ambient);
-        shader.setVec3("material.diffuse", material.diffuse);
-        shader.setVec3("material.specular", material.specular);
-        shader.setFloat("material.shininess", material.shininess);
-
-        shader.setInt("shadowMap", 1);
-
-        glBindVertexArray(vao);
-
-        glDrawArrays(renderMode, 0, size);
-
-        /* P ------ */
-        glm::mat4 transform = glm::translate(unitmat4, glm::vec3(0.0f, 0.0f, 0.0f));
-        glm::mat4 transformScaled = glm::scale(transform, glm::vec3(3.0f, 1.0f, 1.0f));
-
-        shader.setMat4("local_transform", glm::translate(transform, glm::vec3(0.0f, 0.0f, 0.0f)));
-        glDrawArrays(renderMode, 0, size);
-
-        shader.setMat4("local_transform", glm::translate(transformScaled, glm::vec3(0.0f, 2.0f, 0.0f)));
-        glDrawArrays(renderMode, 0, size);
-
-        shader.setMat4("local_transform", glm::translate(transformScaled, glm::vec3(0.0f, 4.0f, 0.0f)));
-        glDrawArrays(renderMode, 0, size);
-
-        shader.setMat4("local_transform", glm::translate(transform, glm::vec3(0.0f, 1.0f, 0.0f)));
-        glDrawArrays(renderMode, 0, size);
-
-        shader.setMat4("local_transform", glm::translate(transform, glm::vec3(0.0f, 3.0f, 0.0f)));
-        glDrawArrays(renderMode, 0, size);
-
-        shader.setMat4("local_transform", glm::translate(transform, glm::vec3(2.0f, 3.0f, 0.0f)));
-        glDrawArrays(renderMode, 0, size);
-        /* -------- */
-    }
-
-    void drawShadows(const glm::mat4 &model, Shader &depthShader, const glm::mat4 &lsm) const override {
-        glm::mat4 unitmat4(1);
-
-        depthShader.setMat4("lightSpaceMatrix", glm::translate(lsm, getPosition()) * getTransform());
-        depthShader.setMat4("model", glm::translate(model, getPosition()) * getTransform());
-        //depthShader.setMat4("lightSpaceMatrix", lsm);
-        //depthShader.setMat4("model", model);
-
-        glBindVertexArray(vao);
-
-        glDrawArrays(renderMode, 0, size);
-
-        /* P ------ */
-        glm::mat4 transform = glm::translate(unitmat4, glm::vec3(0.0f, 0.0f, 0.0f));
-        glm::mat4 transformScaled = glm::scale(transform, glm::vec3(3.0f, 1.0f, 1.0f));
-
-        shader.setMat4("local_transform", glm::translate(transform, glm::vec3(0.0f, 0.0f, 0.0f)));
-        glDrawArrays(renderMode, 0, size);
-
-        shader.setMat4("local_transform", glm::translate(transformScaled, glm::vec3(0.0f, 2.0f, 0.0f)));
-        glDrawArrays(renderMode, 0, size);
-
-        shader.setMat4("local_transform", glm::translate(transformScaled, glm::vec3(0.0f, 4.0f, 0.0f)));
-        glDrawArrays(renderMode, 0, size);
-
-        shader.setMat4("local_transform", glm::translate(transform, glm::vec3(0.0f, 1.0f, 0.0f)));
-        glDrawArrays(renderMode, 0, size);
-
-        shader.setMat4("local_transform", glm::translate(transform, glm::vec3(0.0f, 3.0f, 0.0f)));
-        glDrawArrays(renderMode, 0, size);
-
-        shader.setMat4("local_transform", glm::translate(transform, glm::vec3(2.0f, 3.0f, 0.0f)));
-        glDrawArrays(renderMode, 0, size);
-        /* -------- */
-    }
-};
-
-/// Model for a student
-class Model6 : public Cube, public Drawable {
-public:
-    Shader shader{};
-    Material material{};
-
-    Model6() {
-        this->shader = Shader("../VS2017/resources/shaders/ModelVertexShader.glsl",
-                              "../VS2017/resources/shaders/ModelFragmentShader.glsl",
-                              "../VS2017/resources/textures/metallic_surface.png");
-        this->material = METALLIC;
-    }
-
-    ~Model6() override {
-        glDeleteProgram(shader.ID);
-    }
-
-    void
-    draw(const MVPL mvpl, LightParams lp, const glm::vec3 &cameraPos) const override {
-        glm::mat4 unitmat4(1);
-
-        shader.use();
-        shader.setBool("shadows", shadows);
-        shader.setBool("textures", textures);
-        shader.setMat4("model", glm::translate(mvpl.model, getPosition()) * getTransform());
-        shader.setMat4("view", mvpl.view);
-        shader.setMat4("projection", mvpl.projection);
-        shader.setMat4("lightSpaceMatrix", mvpl.lsm);
-        //shader.setMat4("lightSpaceMatrix", glm::translate(mvpl.lsm, getPosition()) * getTransform());
-        shader.setVec3("viewPos", cameraPos);
-        shader.setVec3("light.position", lp.lightPos);
-        shader.setVec3("light.ambient", lp.lightColor * 0.5f);
-        shader.setVec3("light.diffuse", lp.lightColor * 0.2f);
-        shader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
-        // material properties
-        shader.setVec3("material.ambient", material.ambient);
-        shader.setVec3("material.diffuse", material.diffuse);
-        shader.setVec3("material.specular", material.specular);
-        shader.setFloat("material.shininess", material.shininess);
-
-        shader.setInt("shadowMap", 1);
-
-        glBindVertexArray(vao);
-
-        glm::mat4 transform = glm::translate(unitmat4, glm::vec3(0.0f, 0.0f, 0.0f));
-        glm::mat4 transformScaled = glm::scale(transform, glm::vec3(3.0f, 1.0f, 1.0f));
-
-        /* 6 ------ */
-        transform = glm::translate(unitmat4, glm::vec3(4.0f, 0.0f, 0.0f));
-        transformScaled = glm::scale(transform, glm::vec3(3.0f, 1.0f, 1.0f));
-        shader.setMat4("local_transform", transformScaled);
-        glDrawArrays(renderMode, 0, size);
-
-        shader.setMat4("local_transform", glm::translate(transformScaled, glm::vec3(0.0f, 2.0f, 0.0f)));
-        glDrawArrays(renderMode, 0, size);
-
-        shader.setMat4("local_transform", glm::translate(transformScaled, glm::vec3(0.0f, 4.0f, 0.0f)));
-        glDrawArrays(renderMode, 0, size);
-
-        shader.setMat4("local_transform", glm::translate(transform, glm::vec3(0.0f, 1.0f, 0.0f)));
-        glDrawArrays(renderMode, 0, size);
-
-        shader.setMat4("local_transform", glm::translate(transform, glm::vec3(0.0f, 3.0f, 0.0f)));
-        glDrawArrays(renderMode, 0, size);
-
-        shader.setMat4("local_transform", glm::translate(transform, glm::vec3(2.0f, 1.0f, 0.0f)));
-        glDrawArrays(renderMode, 0, size);
-    }
-
-    void drawShadows(const glm::mat4 &model, Shader &depthShader, const glm::mat4 &lsm) const override {
-        glm::mat4 unitmat4(1);
-
-        depthShader.setMat4("lightSpaceMatrix", glm::translate(lsm, getPosition()) * getTransform());
-        depthShader.setMat4("model", glm::translate(model, getPosition()) * getTransform());
-        //depthShader.setMat4("lightSpaceMatrix", lsm);
-        //depthShader.setMat4("model", model);
-
-        glBindVertexArray(vao);
-
-        /* 6 ------ */
-        glm::mat4 transform = glm::translate(unitmat4, glm::vec3(0.0f, 0.0f, 0.0f));
-        glm::mat4 transformScaled = glm::scale(transform, glm::vec3(3.0f, 1.0f, 1.0f));
-
-        shader.setMat4("local_transform", transformScaled);
-        glDrawArrays(renderMode, 0, size);
-
-        shader.setMat4("local_transform", glm::translate(transformScaled, glm::vec3(0.0f, 2.0f, 0.0f)));
-        glDrawArrays(renderMode, 0, size);
-
-        shader.setMat4("local_transform", glm::translate(transformScaled, glm::vec3(0.0f, 4.0f, 0.0f)));
-        glDrawArrays(renderMode, 0, size);
-
-        shader.setMat4("local_transform", glm::translate(transform, glm::vec3(0.0f, 1.0f, 0.0f)));
-        glDrawArrays(renderMode, 0, size);
-
-        shader.setMat4("local_transform", glm::translate(transform, glm::vec3(0.0f, 3.0f, 0.0f)));
-        glDrawArrays(renderMode, 0, size);
-
-        shader.setMat4("local_transform", glm::translate(transform, glm::vec3(2.0f, 1.0f, 0.0f)));
-        glDrawArrays(renderMode, 0, size);
-    }
-};
-
-
-
-/// Model for a student
-class Model2 : public Cube, public Drawable {
-public:
-    Shader shader{};
-    Material material{};
-
-    Model2() {
-        this->shader = Shader("../VS2017/resources/shaders/ModelVertexShader.glsl",
-                              "../VS2017/resources/shaders/ModelFragmentShader.glsl",
-                              "../VS2017/resources/textures/metallic_surface.png");
-        this->material = METALLIC;
-    }
-
-    ~Model2() override {
-        glDeleteProgram(shader.ID);
-    }
-
-    static glm::mat4
-    scaleandTranslate(int xTran, int yTran, int zTran, int xScale, int yScale, int zScale, glm::mat4 unitmat4) {
-
-
-        glm::mat4 output = glm::translate(unitmat4, glm::vec3(xTran, yTran, zTran));
-        output = glm::scale(output, glm::vec3(xScale, yScale, zScale));
-        return output;
-
-    }
-
-    void
-    draw(const MVPL mvpl, LightParams lp, const glm::vec3 &cameraPos) const override {
-
-        shader.use();
-        shader.setBool("shadows", shadows);
-        shader.setBool("textures", textures);
-        shader.setMat4("model", glm::translate(mvpl.model, getPosition()) * getTransform());
-        shader.setMat4("view", mvpl.view);
-        shader.setMat4("projection", mvpl.projection);
-        shader.setMat4("lightSpaceMatrix", mvpl.lsm);
-        //shader.setMat4("lightSpaceMatrix", glm::translate(mvpl.lsm, getPosition()) * getTransform());
-        shader.setVec3("viewPos", cameraPos);
-        shader.setVec3("light.position", lp.lightPos);
-        shader.setVec3("light.ambient", lp.lightColor * 0.5f);
-        shader.setVec3("light.diffuse", lp.lightColor * 0.2f);
-        shader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
-        // material properties
-        shader.setVec3("material.ambient", material.ambient);
-        shader.setVec3("material.diffuse", material.diffuse);
-        shader.setVec3("material.specular", material.specular);
-        shader.setFloat("material.shininess", material.shininess);
-
-        shader.setInt("shadowMap", 1);
-
-        glBindVertexArray(vao);
-
-        glm::mat4 unitmat4(1);
-        glm::mat4 input(1);
-
-        /* 2 ------ */
-
-        //base
-        shader.setMat4("local_transform", scaleandTranslate(10, 0, 0, 6, 2, 1, unitmat4));
-        glDrawArrays(renderMode, 0, size);
-
-        //leftside
-        shader.setMat4("local_transform", scaleandTranslate(10, 2, 0, 2, 4, 1, unitmat4));
-        glDrawArrays(renderMode, 0, size);
-
-        //middle
-        shader.setMat4("local_transform", scaleandTranslate(12, 4, 0, 2, 2, 1, unitmat4));
-        glDrawArrays(renderMode, 0, size);
-
-        //rightside
-        shader.setMat4("local_transform", scaleandTranslate(14, 4, 0, 2, 4, 1, unitmat4));
-        glDrawArrays(renderMode, 0, size);
-
-        //top
-        shader.setMat4("local_transform", scaleandTranslate(10, 8, 0, 6, 2, 1, unitmat4));
-        glDrawArrays(renderMode, 0, size);
-        /* -------- */
-    }
-
-    void drawShadows(const glm::mat4 &model, Shader &depthShader, const glm::mat4 &lsm) const override {
-
-        depthShader.setMat4("lightSpaceMatrix", glm::translate(lsm, getPosition()) * getTransform());
-        depthShader.setMat4("model", glm::translate(model, getPosition()) * getTransform());
-        //depthShader.setMat4("lightSpaceMatrix", lsm);
-        //depthShader.setMat4("model", model);
-
-        glBindVertexArray(vao);
-
-        glm::mat4 unitmat4(1);
-
-        glm::mat4 movedTwo = scaleandTranslate(10, 0, 0, 6, 2, 1, unitmat4);
-
-        /* 2 ------ */
-
-        //base
-        shader.setMat4("local_transform", scaleandTranslate(10, 0, 0, 6, 2, 1, unitmat4));
-        glDrawArrays(renderMode, 0, size);
-
-        //leftside
-        shader.setMat4("local_transform", scaleandTranslate(10, 2, 0, 2, 4, 1, unitmat4));
-        glDrawArrays(renderMode, 0, size);
-
-        //middle
-        shader.setMat4("local_transform", scaleandTranslate(12, 4, 0, 2, 2, 1, unitmat4));
-        glDrawArrays(renderMode, 0, size);
-
-        //rightside
-        shader.setMat4("local_transform", scaleandTranslate(14, 4, 0, 2, 4, 1, unitmat4));
-        glDrawArrays(renderMode, 0, size);
-
-        //top
-        shader.setMat4("local_transform", scaleandTranslate(10, 8, 0, 6, 2, 1, unitmat4));
-        glDrawArrays(renderMode, 0, size);
-    }
-
-};
-
-/// Model for a student
-class ModelA : public Cube, public Drawable {
-public:
-    Shader shader{};
-    Material material{};
-
-    ModelA() {
-        this->shader = Shader("../VS2017/resources/shaders/ModelVertexShader.glsl",
-                              "../VS2017/resources/shaders/ModelFragmentShader.glsl",
-                              "../VS2017/resources/textures/crate1_wood.png");
-        this->material = WOOD;
-    }
-
-    ~ModelA() override {
-        glDeleteProgram(shader.ID);
-    }
-
-    static glm::mat4
-    scaleandTranslate(int xTran, int yTran, int zTran, int xScale, int yScale, int zScale, glm::mat4 unitmat4) {
-        glm::mat4 output = glm::translate(unitmat4, glm::vec3(xTran, yTran, zTran));
-        output = glm::scale(output, glm::vec3(xScale, yScale, zScale));
-        return output;
-    }
-
-    void
-    draw(const MVPL mvpl, LightParams lp, const glm::vec3 &cameraPos) const override {
-
-        shader.use();
-        shader.setBool("shadows", shadows);
-        shader.setBool("textures", textures);
-        shader.setMat4("model", glm::translate(mvpl.model, getPosition()) * getTransform());
-        shader.setMat4("view", mvpl.view);
-        shader.setMat4("projection", mvpl.projection);
-        shader.setMat4("lightSpaceMatrix", mvpl.lsm);
-        //shader.setMat4("lightSpaceMatrix", glm::translate(mvpl.lsm, getPosition()) * getTransform());
-        shader.setVec3("viewPos", cameraPos);
-        shader.setVec3("light.position", lp.lightPos);
-        shader.setVec3("light.ambient", lp.lightColor * 0.5f);
-        shader.setVec3("light.diffuse", lp.lightColor * 0.2f);
-        shader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
-        // material properties
-        shader.setVec3("material.ambient", material.ambient);
-        shader.setVec3("material.diffuse", material.diffuse);
-        shader.setVec3("material.specular", material.specular);
-        shader.setFloat("material.shininess", material.shininess);
-
-        shader.setInt("shadowMap", 1);
-
-        glBindVertexArray(vao);
-
-        glm::mat4 unitmat4(1);
-        glm::mat4 input(1);
-
-        glDrawArrays(renderMode, 0, size);
-
-        /* A ------ */
-
-        //left side
-        shader.setMat4("local_transform", scaleandTranslate(0.0, 0.0, 0.0, 2.0, 8.0, 1.0, unitmat4));
-        glDrawArrays(renderMode, 0, size);
-
-        //right side
-        shader.setMat4("local_transform", scaleandTranslate(6.0, 0.0, 0.0, 2.0, 8.0, 1.0, unitmat4));
-        glDrawArrays(renderMode, 0, size);
-
-        //top
-        shader.setMat4("local_transform", scaleandTranslate(1.0, 8.0, 0.0, 6.0, 1.0, 1.0, unitmat4));
-        glDrawArrays(renderMode, 0, size);
-
-        shader.setMat4("local_transform", scaleandTranslate(2.0, 9.0, 0.0, 4.0, 1.0, 1.0, unitmat4));
-        glDrawArrays(renderMode, 0, size);
-
-        //middle
-        shader.setMat4("local_transform", scaleandTranslate(2.0, 4.0, 0.0, 4.0, 2.0, 1.0, unitmat4));
-        glDrawArrays(renderMode, 0, size);
-
-    }
-
-    void drawShadows(const glm::mat4 &model, Shader &depthShader, const glm::mat4 &lsm) const override {
-
-        depthShader.setMat4("lightSpaceMatrix", glm::translate(lsm, getPosition()) * getTransform());
-        depthShader.setMat4("model", glm::translate(model, getPosition()) * getTransform());
-        //depthShader.setMat4("lightSpaceMatrix", lsm);
-        //depthShader.setMat4("model", model);
-
-
-        glBindVertexArray(vao);
-
-        glDrawArrays(renderMode, 0, size);
-
-        /* A ------ */
-        glm::mat4 unitmat4 = glm::mat4(1.0f);
-        //left side
-        shader.setMat4("local_transform", scaleandTranslate(0.0, 0.0, 0.0, 2.0, 8.0, 1.0, unitmat4));
-        glDrawArrays(renderMode, 0, size);
-
-        //right side
-        shader.setMat4("local_transform", scaleandTranslate(6.0, 0.0, 0.0, 2.0, 8.0, 1.0, unitmat4));
-        glDrawArrays(renderMode, 0, size);
-
-        //top
-        shader.setMat4("local_transform", scaleandTranslate(1.0, 8.0, 0.0, 6.0, 1.0, 1.0, unitmat4));
-        glDrawArrays(renderMode, 0, size);
-
-        shader.setMat4("local_transform", scaleandTranslate(2.0, 9.0, 0.0, 4.0, 1.0, 1.0, unitmat4));
-        glDrawArrays(renderMode, 0, size);
-
-        //middle
-        shader.setMat4("local_transform", scaleandTranslate(2.0, 4.0, 0.0, 4.0, 2.0, 1.0, unitmat4));
-        glDrawArrays(renderMode, 0, size);
-    }
-};
 
 
 /// light source
