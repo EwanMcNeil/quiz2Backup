@@ -52,6 +52,22 @@ struct Camera {
 } worldCamera;
 
 
+enum class cameraView {
+    WORLD,
+    FIRSTFORWARD,
+    FIRSTBACK,
+    RESET
+};
+
+
+enum class lightPos {
+    MOVING,
+    STATIONARY
+
+};
+
+cameraView cameraViewPos = cameraView::WORLD;
+
 
 
 
@@ -114,7 +130,13 @@ void processMouseMovement(float xoffset, float yoffset, GLFWwindow *window, Came
 }
 
 glm::mat4 GetViewMatrix(Camera &camera) {
-    return glm::lookAt(camera.Position, camera.Position + camera.Front, camera.Up);
+    if (cameraViewPos != cameraView::WORLD) {
+        return glm::lookAt(camera.Position, camera.Position + camera.Front, camera.Up);
+    }
+    else {
+
+        return glm::lookAt(camera.Position, glm::vec3(0.0, 0.0, 0.0), camera.Up);
+    }
 }
 
 /// So the program knows what model is selected
@@ -129,6 +151,8 @@ enum class SelectedModel {
     LIGHT,
     RANDOMIZE
 };
+
+
 
 
 bool startWalking = 0;
@@ -169,7 +193,23 @@ void modelSelect(GLFWwindow *window, int key, int scancode, int action, int mods
     if (glfwGetKey(window, GLFW_KEY_HOME) == GLFW_PRESS)
         selectedModel = SelectedModel::RESET;
 
+    if (glfwGetKey(window, GLFW_KEY_M) == GLFW_PRESS) {
+        if (cameraViewPos == cameraView::WORLD) {
+            cameraViewPos = cameraView::FIRSTFORWARD;
+        }
+        else {
+            cameraViewPos = cameraView::RESET;
+        }
+    }
 
+    if (glfwGetKey(window, GLFW_KEY_B) == GLFW_PRESS) {
+        if (cameraViewPos == cameraView::FIRSTFORWARD) {
+            cameraViewPos = cameraView::FIRSTBACK;
+        }
+        else if (cameraViewPos == cameraView::FIRSTBACK){
+            cameraViewPos = cameraView::FIRSTFORWARD;
+        }
+    }
 
     if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS && lastSpaceAction == GLFW_RELEASE) {
         selectedModel = SelectedModel::RANDOMIZE;
@@ -200,7 +240,7 @@ void processInput(GLFWwindow *window, double deltaTime, Drawable *objectModel) {
         objectModel->setTransform(glm::scale(objectModel->getTransform(), glm::vec3(0.99, 0.99, 0.99)));
     /* ----------------- */
 
-    /* Move and Rotate models */
+    /* Move and Rotate models 
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS && glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
         objectModel->setPosition(objectModel->getPosition() + glm::vec3(0.0f, MoveSpeed * deltaTime, 0.0f));
     else if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
@@ -221,8 +261,36 @@ void processInput(GLFWwindow *window, double deltaTime, Drawable *objectModel) {
     else if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
         objectModel->setTransform(
                 glm::rotate(objectModel->getTransform(), glm::radians(-5.0f), glm::vec3(0.0f, 1.0f, 0.0f)));
+                */
+
+
+
+
+    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS )
+        objectModel->setPosition(objectModel->getPosition() + glm::vec3(0.0f, 0.0f, MoveSpeed * deltaTime));
+   
+    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS )
+        objectModel->setPosition(objectModel->getPosition() + glm::vec3(0.0f, 0.0f, -MoveSpeed * deltaTime));
+    
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+        objectModel->setPosition(objectModel->getPosition() + glm::vec3(-MoveSpeed * deltaTime, 0.0f, 0.0f));
+   
+    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS )
+        objectModel->setPosition(objectModel->getPosition() + glm::vec3(MoveSpeed * deltaTime, 0.0f, 0.0f));
+  
+
+    if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
+        objectModel->setTransform(
+            glm::rotate(objectModel->getTransform(), glm::radians(5.0f), glm::vec3(0.0f, 1.0f, 0.0f)));
+
+
+    if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
+        objectModel->setTransform(
+            glm::rotate(objectModel->getTransform(), glm::radians(5.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
 
     ///code for walking models
+
+    /*
     if (glfwGetKey(window, GLFW_KEY_M) == GLFW_PRESS){
 
         startWalking = 1;
@@ -241,7 +309,7 @@ void processInput(GLFWwindow *window, double deltaTime, Drawable *objectModel) {
 
         }
 
-
+        */
 
         ///code for walking models
         if (glfwGetKey(window, GLFW_KEY_N) == GLFW_PRESS){
@@ -318,20 +386,35 @@ void processInputWorld(GLFWwindow *window, double deltaTime, glm::mat4 &worldMod
     else if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
         camera.Position += glm::normalize(glm::cross(camera.Right, camera.Up)) * (cameraSpeed * 2);
 
-    if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
-        camera.Position -= glm::normalize(glm::cross(camera.Front, camera.Up)) * cameraSpeed;
-    if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
-        camera.Position += glm::normalize(glm::cross(camera.Front, camera.Up)) * cameraSpeed;
+    if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) {
+        
+        const float radius = 40.0f;
+        float camX = sin(glfwGetTime()) * radius;
+        float camZ = cos(glfwGetTime()) * radius;
+
+        std::cout << deltaTime << " " << sin(deltaTime) << "\n" ;
+        
+        camera.Position = glm::vec3(-(camX), camera.Position.y, -(camZ));
+    }
+       
+    if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
+
+        const float radius = 40.0f;
+        float camX = sin(glfwGetTime()) * radius;
+        float camZ = cos(glfwGetTime()) * radius;
+        camera.Position = glm::vec3(camX, camera.Position.y, camZ);
+    }
 
 
-    /* Scale Up and Down */
+
+    /* Scale Up and Down 
     if (glfwGetKey(window, GLFW_KEY_V) == GLFW_PRESS)
         worldModelMatrix = glm::scale(worldModelMatrix, glm::vec3(1.01, 1.01, 1.01));
     if (glfwGetKey(window, GLFW_KEY_B) == GLFW_PRESS)
         worldModelMatrix = glm::scale(worldModelMatrix, glm::vec3(0.99f, 0.99f, 0.99f));
-    /* ----------------- */
+    /* ----------------- 
 
-    /* Move and Rotate models */
+    /* Move and Rotate models *
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
         worldModelMatrix = glm::translate(worldModelMatrix, glm::vec3(0.0f, MoveSpeed * deltaTime, 0.0f));
         //lightSource.setLightPosition(lightSource.getLightPos() + glm::vec3(0.0f, MoveSpeed * deltaTime, 0.0f));
@@ -504,9 +587,8 @@ int main(int argc, char *argv[]) {
 
     // Initialize models
     GroundGrid grid = GroundGrid();
-    Axis axis = Axis();
     Light light = Light();
-    light.setLightPosition(glm::vec3(0.0f, 30.0f, 0.0f));
+    light.setLightPosition(glm::vec3(0.0f, 30.0f, 20.0f));
 
   
 
@@ -539,48 +621,29 @@ int main(int argc, char *argv[]) {
     rightSkate.setPosition(glm::vec3(9.0f, -1.0f, -1.0f));
 
 
-    ModelL modelL = ModelL();
-    modelL.setPosition(glm::vec3(43.0f, 0.0f, 49.0f));
+
+   YAxis yAxis = YAxis();
+   yAxis.setPosition(glm::vec3(0.0f, 0.0f, 0.0f));
+
+   ZAxis zAxis = ZAxis();
+   zAxis.setPosition(glm::vec3(0.0f, 0.0f, 0.0f));
   
+   XAxis xAxis = XAxis();
+   xAxis.setPosition(glm::vec3(0.0f, 0.0f, 0.0f));
 
+
+   // glm::mat4 bigOutput = glm::translate(unitMat, glm::vec3(0.0, 0.0, 0.0));
+  //  bigOutput = glm::scale(bigOutput, glm::vec3(60.0, 60.0, 60.0));
+
+   // Sphere skyBox = Sphere(bigOutput);
    
-
-
-
-
-    ModelA modelA = ModelA();
-    modelA.setPosition(glm::vec3(30.0f, 0.0f, -50.0f));
-    Model2 model2 = Model2();
-
-    ModelP modelP = ModelP();
-    modelP.setPosition(glm::vec3(-50.0f, 0.0f, -50.0f));
-    Model6 model6 = Model6();
-
-
-
-    glm::mat4 output = glm::translate(unitMat, glm::vec3(4.0, 6.5, 0.0));
-    output = glm::scale(output, glm::vec3(1.75, 1.75, 1.75));
-
-    glm::mat4 bigOutput = glm::translate(unitMat, glm::vec3(8.0, 10.5, 0.0));
-    bigOutput = glm::scale(bigOutput, glm::vec3(3.0, 3.0, 3.0));
-
-    Sphere bubbleWill = Sphere(output);
-    SceneNode bubbleWillNode = SceneNode(&bubbleWill, "bubbleWill");
-    Sphere bubbleH3 = Sphere(output);
-    SceneNode bubbleH3Node = SceneNode(&bubbleH3, "bubbleH3");
-    Sphere bubbleEwan = Sphere(bigOutput);
-    SceneNode bubbleEwanNode = SceneNode(&bubbleEwan, "bubbleEwan");
-    Sphere bubblePhil = Sphere(output);
-    SceneNode bubblePhilNode = SceneNode(&bubblePhil, "bubblePhil");
-    Sphere bubbleMoh = Sphere(output);
-    SceneNode bubbleMohNode = SceneNode(&bubbleMoh, "bubbleMoh");
+   
 
 
     // Initialize Nodes
     SceneNode gridNode = SceneNode(&grid, "GroundGrid");
-    SceneNode axisNode = SceneNode(&axis, "Axis");
     SceneNode lightNode = SceneNode(&light, "WorldLight");
-
+   // SceneNode skyBoxNode = SceneNode(&skyBox, "skyBox");
 
     //create node for name
 
@@ -591,11 +654,7 @@ int main(int argc, char *argv[]) {
 
     SceneNode leftskateNode = SceneNode(&leftSkate, "leftSkate");
     SceneNode rightskateNode = SceneNode(&rightSkate, "rightSkate");
-
-
-    SceneNode modelLNode = SceneNode(&modelL, "modelL");
     
-    modelLNode.addChild(&bubbleWillNode);
 
   
 
@@ -605,22 +664,19 @@ int main(int argc, char *argv[]) {
     modelENode.addChild(&leftskateNode);
     modelENode.addChild(&rightskateNode);
 
-    SceneNode modelANode = SceneNode(&modelA, "modelA");
-    SceneNode model2Node = SceneNode(&model2, "model2");
-    modelANode.addChild(&model2Node);
-    modelANode.addChild(&bubbleEwanNode);
 
-    SceneNode modelPNode = SceneNode(&modelP, "modelP");
-    SceneNode model6Node = SceneNode(&model6, "model6");
-    modelPNode.addChild(&model6Node);
-    modelPNode.addChild(&bubblePhilNode);
-
+    SceneNode YaxisNode = SceneNode(&yAxis, "yAxis");
+    SceneNode ZaxisNode = SceneNode(&zAxis, "zAxis");
+    SceneNode XaxisNode = SceneNode(&xAxis, "xAxis");
   
     // Set up scene
     Scene world = Scene();
     world.addNode(&lightNode);
     world.addNode(&gridNode);
-    world.addNode(&axisNode);
+    world.addNode(&YaxisNode);
+    world.addNode(&ZaxisNode);
+    world.addNode(&XaxisNode);
+   // world.addNode(&skyBoxNode);
    
    
 
@@ -629,11 +685,7 @@ int main(int argc, char *argv[]) {
    
 
  
-    world.addNode(&modelLNode);
-  
-    world.addNode(&modelANode);
-    world.addNode(&modelPNode);
-     
+
 
     // MVP matrices
     glm::mat4 worldModelMatrix = glm::mat4(1.0f);
@@ -661,6 +713,34 @@ int main(int argc, char *argv[]) {
 
 
 
+
+        //first person camera controls
+        //TODO if the object rotates apply rotation to the other
+        if (cameraViewPos == cameraView::FIRSTFORWARD) {
+            worldCamera.Position = modelE.getPosition();
+            worldCamera.Front = { 0.0f, 0.0f, 1.0f };
+            worldCamera.Up = { 0.0f, 1.0f, 0.0f };
+            worldCamera.Right = { 1.0f, 0.0f, 0.0f };
+        }
+        if (cameraViewPos == cameraView::FIRSTBACK) {
+            worldCamera.Position = modelE.getPosition();
+            worldCamera.Front = { 0.0f, 0.0f, -1.0f };
+            worldCamera.Up = { 0.0f, 1.0f, 0.0f };
+            worldCamera.Right = { 1.0f, 0.0f, 0.0f };
+        }
+        if (cameraViewPos == cameraView::RESET) {
+            cameraViewPos = cameraView::WORLD;
+            worldCamera.Position = { 0.0f, 20.0f, 50.0f };
+            worldCamera.Front = { 0.0f, 0.0f, 1.0f };
+            worldCamera.Up = { 0.0f, 1.0f, 0.0f };
+            worldCamera.Right = { 1.0f, 0.0f, 0.0f };
+            worldCamera.Pitch = -10.0f;
+            updateCameraVectors(worldCamera);
+           
+       }
+
+
+
         // Input Processing
         if (selectedModel == SelectedModel::ONE) {
             processInput(window, deltaTime, &modelE);
@@ -668,12 +748,7 @@ int main(int argc, char *argv[]) {
         if (selectedModel == SelectedModel::TWO) {
             //processInput(window, deltaTime, &modelLme);
         }
-        if (selectedModel == SelectedModel::THREE) {
-            processInput(window, deltaTime, &modelA);
-        }
-        if (selectedModel == SelectedModel::FOUR) {
-            processInput(window, deltaTime, &modelP);
-        }
+    
         if (selectedModel == SelectedModel::FIVE) {
             //processInput(window, deltaTime, &modelH_2);
         }
@@ -685,21 +760,21 @@ int main(int argc, char *argv[]) {
         }
         // Resets the world orientation and position
         if (selectedModel == SelectedModel::RESET) {
-            modelL.setTransform(unitMat);
-            modelL.setPosition(glm::vec3(43.0f, 0.0f, 49.0f));
-            modelA.setTransform(unitMat);
-            modelA.setPosition(glm::vec3(30.0f, 0.0f, -50.0f));
-            modelP.setTransform(unitMat);
-            modelP.setPosition(glm::vec3(-50.0f, 0.0f, -50.0f));
+           
+           // modelL.setPosition(glm::vec3(43.0f, 0.0f, 49.0f));
+           // modelA.setTransform(unitMat);
+          //  modelA.setPosition(glm::vec3(30.0f, 0.0f, -50.0f));
+           // modelP.setTransform(unitMat);
+            ////modelP.setPosition(glm::vec3(-50.0f, 0.0f, -50.0f));
             light.setLightPosition(glm::vec3(0.0f, 30.0f, 0.0f));
             light.setTransform(unitMat);
             worldModelMatrix = unitMat;
         }
 
         if (selectedModel == SelectedModel::RANDOMIZE) {
-            randomizePosition(&modelL);
-            randomizePosition(&modelA);
-            randomizePosition(&modelP);
+          //  randomizePosition(&modelL);
+          //  randomizePosition(&modelA);
+         //   randomizePosition(&modelP);
             selectedModel = SelectedModel::WORLD;
         }
 
